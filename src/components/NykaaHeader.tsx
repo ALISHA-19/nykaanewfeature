@@ -1,15 +1,17 @@
-import { Search, ShoppingBag, Heart, MapPin, Gift, HelpCircle, Smartphone, ChevronDown, X } from 'lucide-react';
+import { Search, ShoppingBag, Heart, MapPin, Gift, HelpCircle, Smartphone, ChevronDown, X, LogOut, User } from 'lucide-react';
 import nykaaLogo from '@/assets/nykaa-logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 import { nykaaCategories, type NykaaCategory } from '@/data/mockDatabase';
 import { categoryDropdowns } from '@/data/categoryData';
+import { useAuth } from '@/hooks/useAuth';
 
 const NykaaHeader = () => {
   const [searchValue, setSearchValue] = useState('');
   const [openCat, setOpenCat] = useState<NykaaCategory | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const processIntent = useBeautyStore(s => s.processIntent);
+  const { user, profile, signOut } = useAuth();
 
   const handleSearch = () => {
     if (searchValue.trim()) {
