@@ -34,13 +34,14 @@ const severityDot: Record<string, string> = {
   critical: 'bg-destructive',
 };
 
-const ScenarioCard = ({ scenario, onDismiss, onAction }: { scenario: Scenario; onDismiss: () => void; onAction: () => void }) => {
+const ScenarioCard = ({ scenario, onDismiss, onAction, actionedLabel }: { scenario: Scenario; onDismiss: () => void; onAction: () => void; actionedLabel?: string }) => {
   const Icon = scenarioIcons[scenario.type] || Info;
+  const isActioned = !!actionedLabel;
   return (
-    <div className={`rounded-xl border p-4 ${severityStyles[scenario.severity]} animate-fade-in hover:shadow-sm transition-shadow`}>
+    <div className={`rounded-xl border p-4 ${isActioned ? 'border-success/30 bg-success/5' : severityStyles[scenario.severity]} animate-fade-in hover:shadow-sm transition-shadow`}>
       <div className="flex items-start gap-3">
-        <div className={`h-8 w-8 rounded-full ${severityDot[scenario.severity]} flex items-center justify-center shrink-0`}>
-          <Icon className="h-4 w-4 text-card" />
+        <div className={`h-8 w-8 rounded-full ${isActioned ? 'bg-success' : severityDot[scenario.severity]} flex items-center justify-center shrink-0`}>
+          {isActioned ? <CheckCircle2 className="h-4 w-4 text-card" /> : <Icon className="h-4 w-4 text-card" />}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
@@ -50,14 +51,18 @@ const ScenarioCard = ({ scenario, onDismiss, onAction }: { scenario: Scenario; o
             </button>
           </div>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{scenario.description}</p>
-          {scenario.actionLabel && (
+          {isActioned ? (
+            <span className="mt-2 inline-block text-xs font-semibold text-success">
+              {actionedLabel}
+            </span>
+          ) : scenario.actionLabel ? (
             <button
               onClick={onAction}
               className="mt-2 text-xs font-semibold text-primary hover:underline underline-offset-2"
             >
               {scenario.actionLabel} →
             </button>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
@@ -68,7 +73,7 @@ const RoutineDashboard = () => {
   const {
     userProfile, activeRoutine, inventory, scenarios, weather,
     dismissScenario, getProductById, checkReplenishment, allRoutines, activateRoutine,
-    executeScenarioAction, swapProduct, reorderQueue,
+    executeScenarioAction, swapProduct, reorderQueue, actionedScenarios, markScenarioActioned,
   } = useBeautyStore();
 
   const activeScenarios = scenarios.filter(s => s.active);
@@ -89,6 +94,7 @@ const RoutineDashboard = () => {
         break;
       case 'reorder':
         setReorderProductId(result.data.productId);
+        markScenarioActioned(scenarioId, 'Reordered ✓');
         break;
       case 'guard':
         toast.error('Product Blocked', {
@@ -111,7 +117,6 @@ const RoutineDashboard = () => {
         toast.success('Budget swap applied!', {
           description: 'Switched to the affordable alternative. Same ingredients, better price.',
         });
-        dismissScenario('s9');
         break;
     }
   };
@@ -207,6 +212,7 @@ const RoutineDashboard = () => {
                   scenario={s}
                   onDismiss={() => dismissScenario(s.id)}
                   onAction={() => handleScenarioAction(s.id)}
+                  actionedLabel={actionedScenarios[s.id]}
                 />
               ))}
             </div>

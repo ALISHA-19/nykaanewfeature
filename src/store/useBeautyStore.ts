@@ -23,12 +23,14 @@ interface BeautyState {
   weather: WeatherData;
   intentQuery: string;
   reorderQueue: string[];
-  swappedProducts: Record<string, string>; // originalId -> newId
+  swappedProducts: Record<string, string>;
+  actionedScenarios: Record<string, string>; // scenarioId -> status label
 
   setIntentQuery: (q: string) => void;
   processIntent: (q: string) => void;
   activateRoutine: (routineId: string) => void;
   dismissScenario: (scenarioId: string) => void;
+  markScenarioActioned: (scenarioId: string, label: string) => void;
   checkReplenishment: () => InventoryItem[];
   validateIngredients: (productId: string) => { safe: boolean; reason?: string };
   recommendAlternatives: (productId: string) => Product[];
@@ -64,6 +66,7 @@ export const useBeautyStore = create<BeautyState>((set, get) => ({
   intentQuery: '',
   reorderQueue: [],
   swappedProducts: {},
+  actionedScenarios: {},
 
   setIntentQuery: (q) => set({ intentQuery: q }),
 
@@ -90,6 +93,10 @@ export const useBeautyStore = create<BeautyState>((set, get) => ({
 
   dismissScenario: (scenarioId) => {
     set(s => ({ scenarios: s.scenarios.map(sc => sc.id === scenarioId ? { ...sc, active: false } : sc) }));
+  },
+
+  markScenarioActioned: (scenarioId, label) => {
+    set(s => ({ actionedScenarios: { ...s.actionedScenarios, [scenarioId]: label } }));
   },
 
   checkReplenishment: () => {
@@ -160,44 +167,48 @@ export const useBeautyStore = create<BeautyState>((set, get) => ({
     if (!scenario) return { action: 'none' };
 
     switch (scenario.type) {
-      case 'swap': // Winter Dryness - swap gel to cream
+      case 'swap':
         state.swapProduct('p1', 'p2');
-        state.dismissScenario(scenarioId);
+        state.markScenarioActioned(scenarioId, 'Swapped ✓');
         return { action: 'swap', data: { from: 'p1', to: 'p2' } };
 
-      case 'guard': // Allergy guard - show blocked product
+      case 'guard':
+        state.markScenarioActioned(scenarioId, 'Blocked ✓');
         return { action: 'guard', data: { productId: scenario.relatedProductIds[0] } };
 
-      case 'alert': // Sunscreen low - reorder
+      case 'alert':
         return { action: 'reorder', data: { productId: scenario.relatedProductIds[0] } };
 
-      case 'nudge': // Climate nudge - swap oils
+      case 'nudge':
         state.swapProduct('p8', 'p9');
-        state.dismissScenario(scenarioId);
+        state.markScenarioActioned(scenarioId, 'Swapped ✓');
         return { action: 'swap', data: { from: 'p8', to: 'p9' } };
 
-      case 'intent': // Date night
+      case 'intent':
         state.activateRoutine('r3');
-        state.dismissScenario(scenarioId);
+        state.markScenarioActioned(scenarioId, 'Activated ✓');
         return { action: 'routine', data: { routineId: 'r3' } };
 
-      case 'goal': // Acne goal
+      case 'goal':
         state.activateRoutine('r2');
-        state.dismissScenario(scenarioId);
+        state.markScenarioActioned(scenarioId, 'Activated ✓');
         return { action: 'routine', data: { routineId: 'r2' } };
 
-      case 'shade': // Shade match
+      case 'shade':
+        state.markScenarioActioned(scenarioId, 'Viewed ✓');
         return { action: 'shade', data: { shade: state.userProfile.shadeMatch } };
 
-      case 'conflict': // Ingredient conflict
+      case 'conflict':
+        state.markScenarioActioned(scenarioId, 'Reviewed ✓');
         return { action: 'conflict', data: { products: scenario.relatedProductIds } };
 
-      case 'budget': // Budget swap
+      case 'budget':
+        state.markScenarioActioned(scenarioId, 'Swapped ✓');
         return { action: 'budget', data: { from: 'p3', to: 'p4' } };
 
-      case 'calendar': // Wedding
+      case 'calendar':
         state.activateRoutine('r1');
-        state.dismissScenario(scenarioId);
+        state.markScenarioActioned(scenarioId, 'Activated ✓');
         return { action: 'routine', data: { routineId: 'r1' } };
 
       default:
