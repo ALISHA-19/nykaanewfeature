@@ -25,6 +25,20 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    const routineSchema = {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          step: { type: "number" },
+          product: { type: "string" },
+          reason: { type: "string" },
+          suggestion: { type: "string" },
+        },
+        required: ["step", "product", "reason", "suggestion"],
+      },
+    };
+
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
       {
@@ -41,24 +55,7 @@ serve(async (req) => {
               content: [
                 {
                   type: "text",
-                  text: `You are an expert dermatologist and beauty consultant. Analyze this selfie photo and provide a detailed skin analysis. Return your response as a valid JSON object with exactly this structure (no markdown, no code fences, just raw JSON):
-
-{
-  "skinType": "oily" | "dry" | "combination" | "normal" | "sensitive",
-  "undertone": "warm" | "cool" | "neutral",
-  "concerns": ["list of 2-4 visible skin concerns like acne, dark spots, fine lines, dullness, redness, large pores, uneven texture, dehydration"],
-  "foundationShade": "MAC shade code like NC15, NC25, NC35, NC42, NC50, NW20, NW35, NW45",
-  "shadeLabel": "descriptive label like Fair Warm, Light-Medium Neutral, Medium Warm, etc.",
-  "morningRoutine": [
-    {"step": 1, "product": "product type", "reason": "why this step", "suggestion": "specific product name and brand"},
-    ...up to 5 steps
-  ],
-  "nightRoutine": [
-    {"step": 1, "product": "product type", "reason": "why this step", "suggestion": "specific product name and brand"},
-    ...up to 5 steps
-  ],
-  "tips": ["2-3 personalized beauty tips based on what you see"]
-}
+                  text: `You are an expert dermatologist, trichologist, and beauty consultant. Analyze this selfie photo and provide a comprehensive skin AND hair analysis. Look at both the person's skin and their hair carefully.
 
 Be specific and personalized based on what you actually observe in the photo.`,
                 },
@@ -77,11 +74,12 @@ Be specific and personalized based on what you actually observe in the photo.`,
             {
               type: "function",
               function: {
-                name: "skin_analysis",
-                description: "Return structured skin analysis results",
+                name: "beauty_analysis",
+                description: "Return structured skin and hair analysis results from a selfie",
                 parameters: {
                   type: "object",
                   properties: {
+                    // Skin analysis
                     skinType: {
                       type: "string",
                       enum: ["oily", "dry", "combination", "normal", "sensitive"],
@@ -93,49 +91,62 @@ Be specific and personalized based on what you actually observe in the photo.`,
                     concerns: {
                       type: "array",
                       items: { type: "string" },
+                      description: "2-4 visible skin concerns like acne, dark spots, fine lines, dullness, redness, large pores",
                     },
-                    foundationShade: { type: "string" },
-                    shadeLabel: { type: "string" },
-                    morningRoutine: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          step: { type: "number" },
-                          product: { type: "string" },
-                          reason: { type: "string" },
-                          suggestion: { type: "string" },
-                        },
-                        required: ["step", "product", "reason", "suggestion"],
-                      },
+                    foundationShade: {
+                      type: "string",
+                      description: "MAC shade code like NC15, NC25, NC35, NC42, NW20, NW35",
                     },
-                    nightRoutine: {
-                      type: "array",
-                      items: {
-                        type: "object",
-                        properties: {
-                          step: { type: "number" },
-                          product: { type: "string" },
-                          reason: { type: "string" },
-                          suggestion: { type: "string" },
-                        },
-                        required: ["step", "product", "reason", "suggestion"],
-                      },
+                    shadeLabel: {
+                      type: "string",
+                      description: "Descriptive label like Fair Warm, Medium Neutral, etc.",
                     },
-                    tips: {
+                    morningRoutine: routineSchema,
+                    nightRoutine: routineSchema,
+                    skinTips: {
                       type: "array",
                       items: { type: "string" },
+                      description: "2-3 personalized skin care tips",
+                    },
+                    // Hair analysis
+                    hairType: {
+                      type: "string",
+                      enum: ["straight", "wavy", "curly", "coily"],
+                    },
+                    hairTexture: {
+                      type: "string",
+                      enum: ["fine", "medium", "thick"],
+                    },
+                    hairPorosity: {
+                      type: "string",
+                      enum: ["low", "medium", "high"],
+                      description: "Estimated porosity based on visual cues",
+                    },
+                    scalpType: {
+                      type: "string",
+                      enum: ["oily", "dry", "balanced", "sensitive"],
+                    },
+                    hairConcerns: {
+                      type: "array",
+                      items: { type: "string" },
+                      description: "2-4 hair concerns like frizz, thinning, split ends, dandruff, dullness, breakage, dryness, oiliness",
+                    },
+                    hairCareRoutine: {
+                      ...routineSchema,
+                      description: "4-6 step hair care routine with wash day and maintenance products",
+                    },
+                    hairStylingTips: routineSchema,
+                    hairTips: {
+                      type: "array",
+                      items: { type: "string" },
+                      description: "2-3 personalized hair care tips",
                     },
                   },
                   required: [
-                    "skinType",
-                    "undertone",
-                    "concerns",
-                    "foundationShade",
-                    "shadeLabel",
-                    "morningRoutine",
-                    "nightRoutine",
-                    "tips",
+                    "skinType", "undertone", "concerns", "foundationShade", "shadeLabel",
+                    "morningRoutine", "nightRoutine", "skinTips",
+                    "hairType", "hairTexture", "hairPorosity", "scalpType",
+                    "hairConcerns", "hairCareRoutine", "hairStylingTips", "hairTips",
                   ],
                 },
               },
@@ -143,7 +154,7 @@ Be specific and personalized based on what you actually observe in the photo.`,
           ],
           tool_choice: {
             type: "function",
-            function: { name: "skin_analysis" },
+            function: { name: "beauty_analysis" },
           },
         }),
       }
@@ -174,7 +185,6 @@ Be specific and personalized based on what you actually observe in the photo.`,
 
     const data = await response.json();
 
-    // Extract from tool call
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
     if (toolCall?.function?.arguments) {
       const analysis = JSON.parse(toolCall.function.arguments);
@@ -183,7 +193,6 @@ Be specific and personalized based on what you actually observe in the photo.`,
       });
     }
 
-    // Fallback: try parsing content directly
     const content = data.choices?.[0]?.message?.content;
     if (content) {
       const cleaned = content.replace(/```json\n?|\n?```/g, "").trim();
