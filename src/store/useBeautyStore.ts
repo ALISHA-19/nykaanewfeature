@@ -22,6 +22,8 @@ interface BeautyState {
   scenarios: Scenario[];
   weather: WeatherData;
   intentQuery: string;
+  reorderQueue: string[];
+  swappedProducts: Record<string, string>; // originalId -> newId
 
   setIntentQuery: (q: string) => void;
   processIntent: (q: string) => void;
@@ -31,6 +33,9 @@ interface BeautyState {
   validateIngredients: (productId: string) => { safe: boolean; reason?: string };
   recommendAlternatives: (productId: string) => Product[];
   getProductById: (id: string) => Product | undefined;
+  reorderProduct: (productId: string) => void;
+  swapProduct: (fromId: string, toId: string) => void;
+  executeScenarioAction: (scenarioId: string) => { action: string; data?: any };
 }
 
 export const useBeautyStore = create<BeautyState>((set, get) => ({
@@ -57,6 +62,8 @@ export const useBeautyStore = create<BeautyState>((set, get) => ({
   scenarios: scenarios,
   weather: mockWeather,
   intentQuery: '',
+  reorderQueue: [],
+  swappedProducts: {},
 
   setIntentQuery: (q) => set({ intentQuery: q }),
 
