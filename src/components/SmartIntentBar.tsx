@@ -2,6 +2,10 @@ import { useState } from 'react';
 import { Sparkles, ArrowRight, Zap } from 'lucide-react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 
+interface SmartIntentBarProps {
+  onOpenMirror?: () => void;
+}
+
 const suggestions = [
   { label: 'Fix my dull skin', icon: '✨' },
   { label: 'Prep me for date night', icon: '💄' },
@@ -10,7 +14,7 @@ const suggestions = [
   { label: 'Wedding-ready in 10 days', icon: '💍' },
 ];
 
-const SmartIntentBar = () => {
+const SmartIntentBar = ({ onOpenMirror }: SmartIntentBarProps) => {
   const [value, setValue] = useState('');
   const [focused, setFocused] = useState(false);
   const processIntent = useBeautyStore(s => s.processIntent);
@@ -20,6 +24,8 @@ const SmartIntentBar = () => {
     processIntent(q);
     setValue('');
     setFocused(false);
+    // Open Virtual Mirror for AI skin analysis
+    onOpenMirror?.();
   };
 
   return (
