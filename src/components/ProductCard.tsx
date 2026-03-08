@@ -1,4 +1,4 @@
-import { ArrowRightLeft, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { ArrowRightLeft, ShieldCheck, ShieldAlert, Star } from 'lucide-react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 import WhyTooltip from './WhyTooltip';
 import type { Product } from '@/data/mockDatabase';
@@ -18,11 +18,36 @@ const tierBadge: Record<string, string> = {
   luxury: 'bg-primary/10 text-primary',
 };
 
+const StarRating = ({ rating }: { rating: number }) => {
+  const full = Math.floor(rating);
+  const half = rating - full >= 0.5;
+  return (
+    <div className="flex items-center gap-0.5">
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          className={`h-3 w-3 ${
+            i < full
+              ? 'fill-amber-400 text-amber-400'
+              : i === full && half
+              ? 'fill-amber-400/50 text-amber-400'
+              : 'fill-muted text-muted-foreground/30'
+          }`}
+        />
+      ))}
+    </div>
+  );
+};
+
 const ProductCard = ({ product, reason, showSwap = true, showGuard = false, compact = false }: ProductCardProps) => {
   const { recommendAlternatives, validateIngredients } = useBeautyStore();
   const [showAlts, setShowAlts] = useState(false);
   const [guardResult, setGuardResult] = useState<{ safe: boolean; reason?: string } | null>(null);
   const alts = showSwap ? recommendAlternatives(product.id) : [];
+
+  const mrpInr = Math.round(product.mrp * 83);
+  const priceInr = Math.round(product.price * 83);
+  const discount = Math.round(((product.mrp - product.price) / product.mrp) * 100);
 
   if (compact) {
     return (
@@ -36,7 +61,9 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
         )}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground truncate">{product.name}</p>
-          <p className="text-xs text-muted-foreground">{product.brand} · <span className="font-semibold text-primary">₹{(product.price * 83).toLocaleString()}</span></p>
+          <p className="text-xs text-muted-foreground">{product.brand} · <span className="font-semibold text-primary">₹{priceInr.toLocaleString()}</span>
+            {discount > 0 && <span className="text-success ml-1 text-[10px] font-bold">{discount}% Off</span>}
+          </p>
         </div>
         {showSwap && alts.length > 0 && (
           <button onClick={() => setShowAlts(!showAlts)} className="text-xs text-primary hover:underline">Swap</button>
@@ -73,6 +100,15 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
           <h3 className="text-sm font-semibold text-foreground leading-tight">{product.name}</h3>
         </div>
 
+        {/* Star rating */}
+        <div className="flex items-center gap-2">
+          <StarRating rating={product.rating} />
+          <span className="text-xs font-semibold text-foreground">{product.rating}/5</span>
+          <span className="text-[10px] text-muted-foreground">
+            {product.ratingCount.toLocaleString()} ratings &amp; {product.reviewCount.toLocaleString()} reviews
+          </span>
+        </div>
+
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{product.description}</p>
 
         <div className="flex flex-wrap gap-1">
@@ -81,8 +117,17 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
           ))}
         </div>
 
+        {/* Price with MRP & discount */}
         <div className="flex items-center justify-between pt-1">
-          <p className="text-lg font-bold text-foreground">₹{(product.price * 83).toLocaleString()}</p>
+          <div className="flex items-baseline gap-2">
+            {discount > 0 && (
+              <span className="text-sm text-muted-foreground line-through">₹{mrpInr.toLocaleString()}</span>
+            )}
+            <p className="text-lg font-bold text-foreground">₹{priceInr.toLocaleString()}</p>
+            {discount > 0 && (
+              <span className="text-xs font-bold text-success">{discount}% Off</span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             {reason && (
               <WhyTooltip reason={reason}>
@@ -91,6 +136,9 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
             )}
           </div>
         </div>
+        {discount > 0 && (
+          <p className="text-[10px] text-muted-foreground -mt-1">inclusive of all taxes</p>
+        )}
 
         {/* Ingredient Guard */}
         {showGuard && (
