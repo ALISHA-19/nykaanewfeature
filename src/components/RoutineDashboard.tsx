@@ -78,6 +78,9 @@ const RoutineDashboard = () => {
     executeScenarioAction, swapProduct, reorderQueue, actionedScenarios, markScenarioActioned,
   } = useBeautyStore();
 
+  const { profile, signOut } = useAuth();
+  const displayName = profile?.full_name || userProfile.name;
+
   const activeScenarios = scenarios.filter(s => s.active);
   const lowStock = checkReplenishment();
 
