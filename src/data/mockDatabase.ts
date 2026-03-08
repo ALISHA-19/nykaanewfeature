@@ -1,8 +1,15 @@
+export type NykaaCategory = 'Makeup' | 'Skin' | 'Hair' | 'Appliances' | 'Bath & Body' | 'Natural' | 'Mom & Baby' | 'Health & Wellness' | 'Men' | 'Fragrance' | 'Lingerie & Accessories';
+
+export const nykaaCategories: NykaaCategory[] = [
+  'Makeup', 'Skin', 'Hair', 'Appliances', 'Bath & Body', 'Natural', 'Mom & Baby', 'Health & Wellness', 'Men', 'Fragrance', 'Lingerie & Accessories',
+];
+
 export interface Product {
   id: string;
   name: string;
   brand: string;
-  category: 'cleanser' | 'serum' | 'moisturizer' | 'sunscreen' | 'oil' | 'foundation' | 'exfoliant' | 'mask' | 'toner' | 'makeup';
+  category: string;
+  nykaaCategory: NykaaCategory;
   ingredients: string[];
   price: number;
   tier: 'budget' | 'mid' | 'luxury';
