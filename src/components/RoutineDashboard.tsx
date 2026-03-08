@@ -14,6 +14,7 @@ import type { Scenario } from '@/data/mockDatabase';
 import heroImage from '@/assets/hero-beauty.jpg';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 const scenarioIcons: Record<string, typeof Info> = {
   swap: ThermometerSun, alert: AlertTriangle, guard: Shield, nudge: Cloud,
@@ -76,6 +77,9 @@ const RoutineDashboard = () => {
     dismissScenario, getProductById, checkReplenishment, allRoutines, activateRoutine,
     executeScenarioAction, swapProduct, reorderQueue, actionedScenarios, markScenarioActioned,
   } = useBeautyStore();
+
+  const { profile, signOut } = useAuth();
+  const displayName = profile?.full_name || userProfile.name;
 
   const activeScenarios = scenarios.filter(s => s.active);
   const lowStock = checkReplenishment();
@@ -148,7 +152,7 @@ const RoutineDashboard = () => {
               Your Routine,<br />Intelligently Curated
             </h2>
             <p className="text-sm text-primary-foreground/80 mt-2 max-w-sm">
-              Smart routines, proactive alerts, and ingredient safety — all personalized for {userProfile.name}.
+              Smart routines, proactive alerts, and ingredient safety — all personalized for {displayName}.
             </p>
             <div className="flex items-center gap-3 mt-4">
               <span className="text-[10px] uppercase tracking-wider bg-primary/90 text-primary-foreground px-3 py-1 rounded-full font-semibold">
