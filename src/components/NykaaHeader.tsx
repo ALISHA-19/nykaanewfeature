@@ -45,9 +45,7 @@ const NykaaHeader = () => {
 
       {/* Main nav */}
       <div className="container flex items-center gap-6 py-3">
-        <h1 className="text-3xl tracking-tight text-primary" style={{ fontFamily: "'Playfair Display', serif", fontStyle: 'italic', fontWeight: 800, letterSpacing: '-0.02em' }}>
-          NYKAA
-        </h1>
+        <img src={nykaaLogo} alt="Nykaa" className="h-8 object-contain" />
 
         <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-foreground">
           <span>Categories</span>
