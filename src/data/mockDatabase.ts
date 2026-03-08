@@ -1,8 +1,15 @@
+export type NykaaCategory = 'Makeup' | 'Skin' | 'Hair' | 'Appliances' | 'Bath & Body' | 'Natural' | 'Mom & Baby' | 'Health & Wellness' | 'Men' | 'Fragrance' | 'Lingerie & Accessories';
+
+export const nykaaCategories: NykaaCategory[] = [
+  'Makeup', 'Skin', 'Hair', 'Appliances', 'Bath & Body', 'Natural', 'Mom & Baby', 'Health & Wellness', 'Men', 'Fragrance', 'Lingerie & Accessories',
+];
+
 export interface Product {
   id: string;
   name: string;
   brand: string;
-  category: 'cleanser' | 'serum' | 'moisturizer' | 'sunscreen' | 'oil' | 'foundation' | 'exfoliant' | 'mask' | 'toner' | 'makeup';
+  category: string;
+  nykaaCategory: NykaaCategory;
   ingredients: string[];
   price: number;
   tier: 'budget' | 'mid' | 'luxury';
@@ -32,7 +39,7 @@ export interface InventoryItem {
   productId: string;
   purchaseDate: string;
   remainingPercent: number;
-  usageRatePerDay: number; // percent per day
+  usageRatePerDay: number;
 }
 
 export interface WeatherData {
@@ -55,95 +62,296 @@ export interface Scenario {
 
 // ── Products ──
 export const products: Product[] = [
+  // ─── SKIN ───
   {
-    id: 'p1', name: 'Hydra Gel Cleanser', brand: 'CeraVe', category: 'cleanser',
+    id: 'p1', name: 'Hydra Gel Cleanser', brand: 'CeraVe', category: 'cleanser', nykaaCategory: 'Skin',
     ingredients: ['Hyaluronic Acid', 'Ceramides', 'Glycerin'],
     price: 16, tier: 'budget', skinTypes: ['oily', 'combination'], concerns: ['hydration'],
     description: 'Lightweight gel cleanser that maintains skin barrier.',
   },
   {
-    id: 'p2', name: 'Rich Cream Cleanser', brand: 'La Mer', category: 'cleanser',
+    id: 'p2', name: 'Rich Cream Cleanser', brand: 'La Mer', category: 'cleanser', nykaaCategory: 'Skin',
     ingredients: ['Miracle Broth', 'Lime Tea Extract', 'Shea Butter'],
     price: 95, tier: 'luxury', skinTypes: ['dry', 'sensitive'], concerns: ['hydration', 'barrier repair'],
     description: 'Ultra-rich cream cleanser for dry winter skin.',
   },
   {
-    id: 'p3', name: 'Vitamin C Serum', brand: 'Skinceuticals', category: 'serum',
+    id: 'p3', name: 'Vitamin C Serum', brand: 'Skinceuticals', category: 'serum', nykaaCategory: 'Skin',
     ingredients: ['L-Ascorbic Acid', 'Vitamin E', 'Ferulic Acid'],
     price: 166, tier: 'luxury', skinTypes: ['all'], concerns: ['brightening', 'anti-aging'],
     description: 'Gold-standard Vitamin C serum for radiance.',
   },
   {
-    id: 'p4', name: 'Niacinamide Serum', brand: 'The Ordinary', category: 'serum',
+    id: 'p4', name: 'Niacinamide Serum', brand: 'The Ordinary', category: 'serum', nykaaCategory: 'Skin',
     ingredients: ['Niacinamide', 'Zinc PCA'],
     price: 6, tier: 'budget', skinTypes: ['oily', 'combination'], concerns: ['pores', 'oil control'],
     description: 'Affordable pore-minimizing serum.',
   },
   {
-    id: 'p5', name: 'SPF 50 Mineral Sunscreen', brand: 'Supergoop', category: 'sunscreen',
+    id: 'p5', name: 'SPF 50 Mineral Sunscreen', brand: 'Supergoop', category: 'sunscreen', nykaaCategory: 'Skin',
     ingredients: ['Zinc Oxide', 'Titanium Dioxide', 'Vitamin E'],
     price: 36, tier: 'mid', skinTypes: ['all'], concerns: ['sun protection'],
     description: 'Lightweight mineral sunscreen, no white cast.',
   },
   {
-    id: 'p6', name: 'Retinol Renewal Serum', brand: 'Paula\'s Choice', category: 'serum',
+    id: 'p6', name: 'Retinol Renewal Serum', brand: "Paula's Choice", category: 'serum', nykaaCategory: 'Skin',
     ingredients: ['Retinol', 'Peptides', 'Vitamin C'],
     price: 38, tier: 'mid', skinTypes: ['normal', 'combination'], concerns: ['anti-aging', 'texture'],
     description: 'Gentle retinol for evening use. Do not mix with strong actives.',
   },
   {
-    id: 'p7', name: 'BHA Liquid Exfoliant', brand: 'Paula\'s Choice', category: 'exfoliant',
+    id: 'p7', name: 'BHA Liquid Exfoliant', brand: "Paula's Choice", category: 'exfoliant', nykaaCategory: 'Skin',
     ingredients: ['Salicylic Acid', 'Green Tea Extract'],
     price: 32, tier: 'mid', skinTypes: ['oily', 'combination'], concerns: ['acne', 'pores'],
     description: 'Cult-favorite BHA for unclogging pores.',
   },
   {
-    id: 'p8', name: 'Jasmine Hair Oil', brand: 'Moroccanoil', category: 'oil',
-    ingredients: ['Argan Oil', 'Jasmine Extract', 'Fragrance'],
-    price: 48, tier: 'mid', skinTypes: ['all'], concerns: ['hair hydration'],
-    description: 'Rich nourishing hair oil. Contains fragrance.',
-  },
-  {
-    id: 'p9', name: 'Light Argan Mist', brand: 'Moroccanoil', category: 'oil',
-    ingredients: ['Argan Oil', 'Cyclomethicone'],
-    price: 34, tier: 'mid', skinTypes: ['all'], concerns: ['hair hydration'],
-    description: 'Lightweight spray oil ideal for humid climates.',
-  },
-  {
-    id: 'p10', name: 'Studio Fix Foundation NC35', brand: 'MAC', category: 'foundation',
-    ingredients: ['Silica', 'Dimethicone', 'Iron Oxides'],
-    price: 40, tier: 'mid', skinTypes: ['all'], concerns: ['coverage'],
-    description: 'Medium-to-full coverage foundation. Shade NC35.',
-  },
-  {
-    id: 'p11', name: 'Matte Lip Kit — Date Night', brand: 'Charlotte Tilbury', category: 'makeup',
-    ingredients: ['Jojoba Oil', 'Vitamin E', 'Iron Oxides'],
-    price: 34, tier: 'mid', skinTypes: ['all'], concerns: ['makeup'],
-    description: 'Iconic matte lip in Pillow Talk shade.',
-  },
-  {
-    id: 'p12', name: 'Setting Spray — Date Night', brand: 'Urban Decay', category: 'makeup',
-    ingredients: ['Aloe Vera', 'Green Tea Extract'],
-    price: 33, tier: 'mid', skinTypes: ['all'], concerns: ['makeup longevity'],
-    description: 'All Nighter setting spray for 16-hour wear.',
-  },
-  {
-    id: 'p13', name: 'Barrier Repair Moisturizer', brand: 'Dr. Jart+', category: 'moisturizer',
+    id: 'p13', name: 'Barrier Repair Moisturizer', brand: 'Dr. Jart+', category: 'moisturizer', nykaaCategory: 'Skin',
     ingredients: ['Ceramides', 'Madecassoside', 'Shea Butter'],
     price: 52, tier: 'mid', skinTypes: ['dry', 'sensitive'], concerns: ['barrier repair', 'hydration'],
     description: 'Ceramide-rich cream to restore damaged barriers.',
   },
   {
-    id: 'p14', name: 'Azelaic Acid Suspension', brand: 'The Ordinary', category: 'serum',
+    id: 'p14', name: 'Azelaic Acid Suspension', brand: 'The Ordinary', category: 'serum', nykaaCategory: 'Skin',
     ingredients: ['Azelaic Acid'],
     price: 8, tier: 'budget', skinTypes: ['all'], concerns: ['acne', 'redness'],
     description: 'Gentle multi-tasker for acne and uneven skin tone.',
   },
   {
-    id: 'p15', name: 'Fragrance Serum Elixir', brand: 'Dior', category: 'serum',
+    id: 'p15', name: 'Fragrance Serum Elixir', brand: 'Dior', category: 'serum', nykaaCategory: 'Skin',
     ingredients: ['Rose Extract', 'Fragrance', 'Glycerin'],
     price: 120, tier: 'luxury', skinTypes: ['normal'], concerns: ['hydration'],
     description: 'Luxurious fragranced serum. Not for sensitive skin.',
+  },
+
+  // ─── HAIR ───
+  {
+    id: 'p8', name: 'Jasmine Hair Oil', brand: 'Moroccanoil', category: 'oil', nykaaCategory: 'Hair',
+    ingredients: ['Argan Oil', 'Jasmine Extract', 'Fragrance'],
+    price: 48, tier: 'mid', skinTypes: ['all'], concerns: ['hair hydration'],
+    description: 'Rich nourishing hair oil. Contains fragrance.',
+  },
+  {
+    id: 'p9', name: 'Light Argan Mist', brand: 'Moroccanoil', category: 'oil', nykaaCategory: 'Hair',
+    ingredients: ['Argan Oil', 'Cyclomethicone'],
+    price: 34, tier: 'mid', skinTypes: ['all'], concerns: ['hair hydration'],
+    description: 'Lightweight spray oil ideal for humid climates.',
+  },
+  {
+    id: 'h1', name: 'Anti-Hairfall Shampoo', brand: "L'Oréal Professionnel", category: 'shampoo', nykaaCategory: 'Hair',
+    ingredients: ['Aminexil', 'Omega-6', 'Biotin'],
+    price: 22, tier: 'mid', skinTypes: ['all'], concerns: ['hair fall'],
+    description: 'Strengthens hair from root to tip, reduces hair fall.',
+  },
+  {
+    id: 'h2', name: 'Keratin Smooth Conditioner', brand: 'TRESemmé', category: 'conditioner', nykaaCategory: 'Hair',
+    ingredients: ['Keratin', 'Argan Oil', 'Marula Oil'],
+    price: 8, tier: 'budget', skinTypes: ['all'], concerns: ['frizz control'],
+    description: 'Salon-smooth finish with keratin protein complex.',
+  },
+  {
+    id: 'h3', name: 'Onion Hair Mask', brand: 'WOW Skin Science', category: 'mask', nykaaCategory: 'Hair',
+    ingredients: ['Red Onion Seed Oil', 'Black Seed Oil', 'Pro-Vitamin B5'],
+    price: 12, tier: 'budget', skinTypes: ['all'], concerns: ['hair growth'],
+    description: 'Deep conditioning mask that promotes hair growth.',
+  },
+
+  // ─── MAKEUP ───
+  {
+    id: 'p10', name: 'Studio Fix Foundation NC35', brand: 'MAC', category: 'foundation', nykaaCategory: 'Makeup',
+    ingredients: ['Silica', 'Dimethicone', 'Iron Oxides'],
+    price: 40, tier: 'mid', skinTypes: ['all'], concerns: ['coverage'],
+    description: 'Medium-to-full coverage foundation. Shade NC35.',
+  },
+  {
+    id: 'p11', name: 'Matte Lip Kit — Date Night', brand: 'Charlotte Tilbury', category: 'makeup', nykaaCategory: 'Makeup',
+    ingredients: ['Jojoba Oil', 'Vitamin E', 'Iron Oxides'],
+    price: 34, tier: 'mid', skinTypes: ['all'], concerns: ['makeup'],
+    description: 'Iconic matte lip in Pillow Talk shade.',
+  },
+  {
+    id: 'p12', name: 'Setting Spray — Date Night', brand: 'Urban Decay', category: 'makeup', nykaaCategory: 'Makeup',
+    ingredients: ['Aloe Vera', 'Green Tea Extract'],
+    price: 33, tier: 'mid', skinTypes: ['all'], concerns: ['makeup longevity'],
+    description: 'All Nighter setting spray for 16-hour wear.',
+  },
+  {
+    id: 'm1', name: 'Colossal Kajal', brand: 'Maybelline', category: 'makeup', nykaaCategory: 'Makeup',
+    ingredients: ['Carbon Black', 'Castor Oil', 'Vitamin E'],
+    price: 4, tier: 'budget', skinTypes: ['all'], concerns: ['eye makeup'],
+    description: 'Intense black kajal, 24-hour smudge-proof.',
+  },
+  {
+    id: 'm2', name: 'Fit Me Compact Powder', brand: 'Maybelline', category: 'makeup', nykaaCategory: 'Makeup',
+    ingredients: ['Silica', 'Talc', 'Zinc Stearate'],
+    price: 7, tier: 'budget', skinTypes: ['oily', 'combination'], concerns: ['oil control'],
+    description: 'Poreless, matte finish. Shade 230 Natural Buff.',
+  },
+  {
+    id: 'm3', name: 'Lash Sensational Mascara', brand: 'Maybelline', category: 'makeup', nykaaCategory: 'Makeup',
+    ingredients: ['Beeswax', 'Carnauba Wax', 'Iron Oxides'],
+    price: 10, tier: 'budget', skinTypes: ['all'], concerns: ['lash volume'],
+    description: 'Fan-out fanning brush for a full-fan effect.',
+  },
+
+  // ─── BATH & BODY ───
+  {
+    id: 'bb1', name: 'Japanese Cherry Blossom Shower Gel', brand: 'Bath & Body Works', category: 'body-wash', nykaaCategory: 'Bath & Body',
+    ingredients: ['Aloe Leaf Juice', 'Shea Butter', 'Vitamin E'],
+    price: 14, tier: 'mid', skinTypes: ['all'], concerns: ['body cleansing'],
+    description: 'Rich lathering shower gel with iconic cherry blossom scent.',
+  },
+  {
+    id: 'bb2', name: 'Cocoa Butter Body Lotion', brand: 'Vaseline', category: 'body-lotion', nykaaCategory: 'Bath & Body',
+    ingredients: ['Cocoa Butter', 'Micro-Droplets of Vaseline Jelly', 'Glycerin'],
+    price: 6, tier: 'budget', skinTypes: ['dry'], concerns: ['body moisturizing'],
+    description: 'Deep moisture for dry, rough skin. 48-hour lock-in.',
+  },
+  {
+    id: 'bb3', name: 'Coffee Body Scrub', brand: 'mCaffeine', category: 'body-wash', nykaaCategory: 'Bath & Body',
+    ingredients: ['Arabica Coffee', 'Coconut Oil', 'Vitamin E'],
+    price: 10, tier: 'budget', skinTypes: ['all'], concerns: ['exfoliation', 'tan removal'],
+    description: 'Exfoliating body scrub that removes tan and dead skin.',
+  },
+
+  // ─── NATURAL ───
+  {
+    id: 'n1', name: 'Kumkumadi Tailam Face Oil', brand: 'Kama Ayurveda', category: 'oil', nykaaCategory: 'Natural',
+    ingredients: ['Saffron', 'Sesame Oil', 'Vetiver'],
+    price: 35, tier: 'mid', skinTypes: ['all'], concerns: ['brightening', 'anti-aging'],
+    description: 'Ayurvedic miracle oil for glowing, youthful skin.',
+  },
+  {
+    id: 'n2', name: 'Aloe Vera Gel', brand: 'Khadi Natural', category: 'moisturizer', nykaaCategory: 'Natural',
+    ingredients: ['Aloe Vera Extract', 'Vitamin E'],
+    price: 5, tier: 'budget', skinTypes: ['all'], concerns: ['soothing', 'hydration'],
+    description: 'Pure aloe gel for face, body, and hair.',
+  },
+  {
+    id: 'n3', name: 'Rose Water Toner', brand: 'Forest Essentials', category: 'toner', nykaaCategory: 'Natural',
+    ingredients: ['Steam-Distilled Rose Water', 'Glycerin'],
+    price: 18, tier: 'mid', skinTypes: ['all'], concerns: ['toning', 'refreshing'],
+    description: 'Pure rose water to hydrate and tone skin naturally.',
+  },
+
+  // ─── MOM & BABY ───
+  {
+    id: 'mb1', name: 'Baby Gentle Wash', brand: 'Mamaearth', category: 'baby-care', nykaaCategory: 'Mom & Baby',
+    ingredients: ['Oat Protein', 'Coconut-Based Cleansers', 'Calendula'],
+    price: 8, tier: 'budget', skinTypes: ['sensitive'], concerns: ['gentle cleansing'],
+    description: 'Tear-free, toxin-free wash for delicate baby skin.',
+  },
+  {
+    id: 'mb2', name: 'Stretch Mark Cream', brand: 'Bio-Oil', category: 'moisturizer', nykaaCategory: 'Mom & Baby',
+    ingredients: ['PurCellin Oil', 'Vitamin A', 'Calendula Oil'],
+    price: 15, tier: 'mid', skinTypes: ['all'], concerns: ['stretch marks'],
+    description: 'Clinically proven to improve appearance of stretch marks.',
+  },
+  {
+    id: 'mb3', name: 'Baby Sunscreen SPF 30', brand: 'Cetaphil Baby', category: 'sunscreen', nykaaCategory: 'Mom & Baby',
+    ingredients: ['Zinc Oxide', 'Organic Sunflower Oil', 'Vitamin E'],
+    price: 12, tier: 'mid', skinTypes: ['sensitive'], concerns: ['sun protection'],
+    description: 'Mineral sunscreen safe for babies 6 months and up.',
+  },
+
+  // ─── HEALTH & WELLNESS ───
+  {
+    id: 'hw1', name: 'Biotin Hair Gummies', brand: 'Sugar Bear Hair', category: 'supplement', nykaaCategory: 'Health & Wellness',
+    ingredients: ['Biotin', 'Folic Acid', 'Vitamin D'],
+    price: 30, tier: 'mid', skinTypes: ['all'], concerns: ['hair growth'],
+    description: 'Tasty gummy vitamins for thicker, longer hair.',
+  },
+  {
+    id: 'hw2', name: 'Collagen Powder', brand: 'Vital Proteins', category: 'supplement', nykaaCategory: 'Health & Wellness',
+    ingredients: ['Bovine Collagen Peptides', 'Vitamin C', 'Hyaluronic Acid'],
+    price: 45, tier: 'mid', skinTypes: ['all'], concerns: ['skin elasticity', 'joint health'],
+    description: 'Grass-fed collagen peptides for skin, hair, nails & joints.',
+  },
+  {
+    id: 'hw3', name: 'Omega-3 Fish Oil', brand: 'HealthKart', category: 'supplement', nykaaCategory: 'Health & Wellness',
+    ingredients: ['EPA', 'DHA', 'Vitamin E'],
+    price: 12, tier: 'budget', skinTypes: ['all'], concerns: ['heart health', 'skin health'],
+    description: 'High-potency fish oil for overall wellness.',
+  },
+
+  // ─── MEN ───
+  {
+    id: 'mn1', name: 'Charcoal Face Wash', brand: 'Bombay Shaving Company', category: 'cleanser', nykaaCategory: 'Men',
+    ingredients: ['Activated Charcoal', 'Tea Tree Oil', 'Aloe Vera'],
+    price: 8, tier: 'budget', skinTypes: ['oily'], concerns: ['deep cleansing', 'oil control'],
+    description: 'Deep-cleansing charcoal face wash for men.',
+  },
+  {
+    id: 'mn2', name: 'Beard Growth Oil', brand: 'Ustraa', category: 'oil', nykaaCategory: 'Men',
+    ingredients: ['Redensyl', 'Jojoba Oil', 'Vitamin E'],
+    price: 10, tier: 'budget', skinTypes: ['all'], concerns: ['beard growth'],
+    description: 'Promotes thicker, fuller beard growth in 8 weeks.',
+  },
+  {
+    id: 'mn3', name: 'Anti-Acne Face Moisturizer', brand: 'Man Matters', category: 'moisturizer', nykaaCategory: 'Men',
+    ingredients: ['Niacinamide', 'Salicylic Acid', 'Tea Tree Oil'],
+    price: 12, tier: 'budget', skinTypes: ['oily', 'combination'], concerns: ['acne', 'oil control'],
+    description: 'Lightweight moisturizer that fights acne without greasiness.',
+  },
+
+  // ─── FRAGRANCE ───
+  {
+    id: 'f1', name: 'Black Opium EDP', brand: 'YSL', category: 'perfume', nykaaCategory: 'Fragrance',
+    ingredients: ['Black Coffee', 'White Flowers', 'Vanilla'],
+    price: 95, tier: 'luxury', skinTypes: ['all'], concerns: ['fragrance'],
+    description: "Rock'n'roll meets sweetness — addictive coffee-vanilla scent.",
+  },
+  {
+    id: 'f2', name: 'Sauvage EDT', brand: 'Dior', category: 'perfume', nykaaCategory: 'Fragrance',
+    ingredients: ['Bergamot', 'Ambroxan', 'Pepper'],
+    price: 110, tier: 'luxury', skinTypes: ['all'], concerns: ['fragrance'],
+    description: 'Fresh, raw, noble. The iconic men\'s fragrance.',
+  },
+  {
+    id: 'f3', name: 'Cherry Blossom Body Mist', brand: 'The Body Shop', category: 'perfume', nykaaCategory: 'Fragrance',
+    ingredients: ['Cherry Blossom Extract', 'Alcohol Denat.'],
+    price: 12, tier: 'budget', skinTypes: ['all'], concerns: ['light fragrance'],
+    description: 'Light, floral everyday body mist.',
+  },
+
+  // ─── APPLIANCES ───
+  {
+    id: 'a1', name: 'Ionic Hair Dryer 2200W', brand: 'Philips', category: 'hair-tool', nykaaCategory: 'Appliances',
+    ingredients: ['Ionic Technology', 'Ceramic Heating'],
+    price: 35, tier: 'mid', skinTypes: ['all'], concerns: ['hair styling'],
+    description: 'Fast-dry with ionic tech for frizz-free results.',
+  },
+  {
+    id: 'a2', name: 'Keratin Protect Straightener', brand: 'Philips', category: 'hair-tool', nykaaCategory: 'Appliances',
+    ingredients: ['Keratin-Infused Plates', 'Ceramic Coating'],
+    price: 55, tier: 'mid', skinTypes: ['all'], concerns: ['hair straightening'],
+    description: 'Infuses keratin while styling. Up to 230°C.',
+  },
+  {
+    id: 'a3', name: 'Facial Cleansing Brush', brand: 'FOREO Luna', category: 'hair-tool', nykaaCategory: 'Appliances',
+    ingredients: ['Silicone Touchpoints', 'T-Sonic Pulsations'],
+    price: 80, tier: 'luxury', skinTypes: ['all'], concerns: ['deep cleansing'],
+    description: 'Silicone facial brush — 99.5% of dirt & oil removed.',
+  },
+
+  // ─── LINGERIE & ACCESSORIES ───
+  {
+    id: 'la1', name: 'Everyday Cotton Bralette', brand: 'Nykd by Nykaa', category: 'lingerie', nykaaCategory: 'Lingerie & Accessories',
+    ingredients: ['95% Cotton', '5% Spandex'],
+    price: 14, tier: 'budget', skinTypes: ['all'], concerns: ['comfort'],
+    description: 'Soft cotton bralette for everyday comfort. Wire-free.',
+  },
+  {
+    id: 'la2', name: 'Silk Sleep Mask', brand: 'Nykaa', category: 'accessory', nykaaCategory: 'Lingerie & Accessories',
+    ingredients: ['100% Mulberry Silk'],
+    price: 10, tier: 'budget', skinTypes: ['all'], concerns: ['sleep quality'],
+    description: 'Pure silk sleep mask — gentle on skin and lashes.',
+  },
+  {
+    id: 'la3', name: 'Jade Face Roller', brand: 'Nykaa Naturals', category: 'accessory', nykaaCategory: 'Lingerie & Accessories',
+    ingredients: ['Natural Jade Stone'],
+    price: 15, tier: 'mid', skinTypes: ['all'], concerns: ['de-puffing', 'lymphatic drainage'],
+    description: 'Dual-ended jade roller for face and under-eye.',
   },
 ];
 
@@ -155,7 +363,7 @@ export const routines: Routine[] = [
     steps: [
       { order: 1, productId: 'p2', timeOfDay: 'both', instruction: 'Massage onto damp skin for 60s' },
       { order: 2, productId: 'p3', timeOfDay: 'morning', instruction: 'Apply 4 drops to face and neck' },
-      { order: 3, productId: 'p13', timeOfDay: 'both', instruction: 'Press into skin, don\'t rub' },
+      { order: 3, productId: 'p13', timeOfDay: 'both', instruction: "Press into skin, don't rub" },
       { order: 4, productId: 'p5', timeOfDay: 'morning', instruction: 'Apply generously as final step' },
     ],
   },

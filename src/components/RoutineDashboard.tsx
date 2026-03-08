@@ -9,6 +9,7 @@ import ProductCard from './ProductCard';
 import ReorderModal from './ReorderModal';
 import VirtualMirror from './VirtualMirror';
 import ConflictModal from './ConflictModal';
+import CategoryBrowser from './CategoryBrowser';
 import type { Scenario } from '@/data/mockDatabase';
 import heroImage from '@/assets/hero-beauty.jpg';
 import { useState } from 'react';
@@ -194,6 +195,9 @@ const RoutineDashboard = () => {
 
         {/* Smart Intent Bar */}
         <SmartIntentBar />
+
+        {/* Category Browser */}
+        <CategoryBrowser />
 
         {/* Intelligence Feed */}
         {activeScenarios.length > 0 && (
