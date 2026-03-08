@@ -6,8 +6,13 @@ import { useBeautyStore } from '@/store/useBeautyStore';
 import NykaaHeader from './NykaaHeader';
 import SmartIntentBar from './SmartIntentBar';
 import ProductCard from './ProductCard';
+import ReorderModal from './ReorderModal';
+import VirtualMirror from './VirtualMirror';
+import ConflictModal from './ConflictModal';
 import type { Scenario } from '@/data/mockDatabase';
 import heroImage from '@/assets/hero-beauty.jpg';
+import { useState } from 'react';
+import { toast } from 'sonner';
 
 const scenarioIcons: Record<string, typeof Info> = {
   swap: ThermometerSun, alert: AlertTriangle, guard: Shield, nudge: Cloud,
@@ -29,7 +34,7 @@ const severityDot: Record<string, string> = {
   critical: 'bg-destructive',
 };
 
-const ScenarioCard = ({ scenario, onDismiss }: { scenario: Scenario; onDismiss: () => void }) => {
+const ScenarioCard = ({ scenario, onDismiss, onAction }: { scenario: Scenario; onDismiss: () => void; onAction: () => void }) => {
   const Icon = scenarioIcons[scenario.type] || Info;
   return (
     <div className={`rounded-xl border p-4 ${severityStyles[scenario.severity]} animate-fade-in hover:shadow-sm transition-shadow`}>
@@ -46,7 +51,10 @@ const ScenarioCard = ({ scenario, onDismiss }: { scenario: Scenario; onDismiss: 
           </div>
           <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{scenario.description}</p>
           {scenario.actionLabel && (
-            <button className="mt-2 text-xs font-semibold text-primary hover:underline underline-offset-2">
+            <button
+              onClick={onAction}
+              className="mt-2 text-xs font-semibold text-primary hover:underline underline-offset-2"
+            >
               {scenario.actionLabel} →
             </button>
           )}
@@ -60,14 +68,68 @@ const RoutineDashboard = () => {
   const {
     userProfile, activeRoutine, inventory, scenarios, weather,
     dismissScenario, getProductById, checkReplenishment, allRoutines, activateRoutine,
+    executeScenarioAction, swapProduct,
   } = useBeautyStore();
 
   const activeScenarios = scenarios.filter(s => s.active);
   const lowStock = checkReplenishment();
 
+  const [reorderProductId, setReorderProductId] = useState<string | null>(null);
+  const [showMirror, setShowMirror] = useState(false);
+  const [conflictProducts, setConflictProducts] = useState<string[] | null>(null);
+
+  const handleScenarioAction = (scenarioId: string) => {
+    const result = executeScenarioAction(scenarioId);
+
+    switch (result.action) {
+      case 'swap':
+        toast.success('Product swapped successfully!', {
+          description: `Your routine has been updated with the better-suited product.`,
+        });
+        break;
+      case 'reorder':
+        setReorderProductId(result.data.productId);
+        break;
+      case 'guard':
+        toast.error('Product Blocked', {
+          description: 'This product contains allergens from your profile. It cannot be added.',
+        });
+        break;
+      case 'routine':
+        toast.success('Routine activated!', {
+          description: 'Your routine has been switched. Scroll down to see the steps.',
+        });
+        break;
+      case 'shade':
+        setShowMirror(true);
+        break;
+      case 'conflict':
+        setConflictProducts(result.data.products);
+        break;
+      case 'budget':
+        swapProduct(result.data.from, result.data.to);
+        toast.success('Budget swap applied!', {
+          description: 'Switched to the affordable alternative. Same ingredients, better price.',
+        });
+        dismissScenario('s9');
+        break;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
       <NykaaHeader />
+
+      {/* Modals */}
+      {reorderProductId && (
+        <ReorderModal productId={reorderProductId} onClose={() => setReorderProductId(null)} />
+      )}
+      {showMirror && (
+        <VirtualMirror onClose={() => setShowMirror(false)} />
+      )}
+      {conflictProducts && (
+        <ConflictModal productIds={conflictProducts} onClose={() => setConflictProducts(null)} />
+      )}
 
       {/* Hero Banner */}
       <div className="relative h-[260px] overflow-hidden">
@@ -86,9 +148,12 @@ const RoutineDashboard = () => {
               <span className="text-[10px] uppercase tracking-wider bg-primary/90 text-primary-foreground px-3 py-1 rounded-full font-semibold">
                 Skin: {userProfile.skinType}
               </span>
-              <span className="text-[10px] uppercase tracking-wider bg-card/20 backdrop-blur text-primary-foreground px-3 py-1 rounded-full font-medium">
-                Shade: {userProfile.shadeMatch}
-              </span>
+              <button
+                onClick={() => setShowMirror(true)}
+                className="text-[10px] uppercase tracking-wider bg-card/20 backdrop-blur text-primary-foreground px-3 py-1 rounded-full font-medium hover:bg-card/30 transition-colors cursor-pointer"
+              >
+                Shade: {userProfile.shadeMatch} ✨
+              </button>
             </div>
           </div>
         </div>
@@ -137,7 +202,12 @@ const RoutineDashboard = () => {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {activeScenarios.map(s => (
-                <ScenarioCard key={s.id} scenario={s} onDismiss={() => dismissScenario(s.id)} />
+                <ScenarioCard
+                  key={s.id}
+                  scenario={s}
+                  onDismiss={() => dismissScenario(s.id)}
+                  onAction={() => handleScenarioAction(s.id)}
+                />
               ))}
             </div>
           </section>
@@ -217,7 +287,10 @@ const RoutineDashboard = () => {
                         <div className="h-full rounded-full bg-warning transition-all" style={{ width: `${item.remainingPercent}%` }} />
                       </div>
                     </div>
-                    <button className="nykaa-gradient rounded-lg px-3 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity shrink-0">
+                    <button
+                      onClick={() => setReorderProductId(item.productId)}
+                      className="nykaa-gradient rounded-lg px-3 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity shrink-0"
+                    >
                       Reorder
                     </button>
                   </div>
