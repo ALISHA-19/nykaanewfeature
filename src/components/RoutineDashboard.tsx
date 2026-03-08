@@ -1,36 +1,52 @@
 import {
   AlertTriangle, CheckCircle2, Info, XCircle, X, Cloud, Droplets, Sun,
+  Calendar, Shield, Palette, DollarSign, Sparkles, Flame, ThermometerSun,
 } from 'lucide-react';
 import { useBeautyStore } from '@/store/useBeautyStore';
+import NykaaHeader from './NykaaHeader';
 import SmartIntentBar from './SmartIntentBar';
 import ProductCard from './ProductCard';
 import type { Scenario } from '@/data/mockDatabase';
 import heroImage from '@/assets/hero-beauty.jpg';
 
-const severityConfig: Record<string, { icon: typeof Info; className: string }> = {
-  info: { icon: Info, className: 'border-info/20 bg-info/5' },
-  warning: { icon: AlertTriangle, className: 'border-warning/20 bg-warning/5' },
-  success: { icon: CheckCircle2, className: 'border-success/20 bg-success/5' },
-  critical: { icon: XCircle, className: 'border-destructive/20 bg-destructive/5' },
+const scenarioIcons: Record<string, typeof Info> = {
+  swap: ThermometerSun, alert: AlertTriangle, guard: Shield, nudge: Cloud,
+  intent: Sparkles, goal: Flame, shade: Palette, conflict: AlertTriangle,
+  budget: DollarSign, calendar: Calendar,
+};
+
+const severityStyles: Record<string, string> = {
+  info: 'border-info/30 bg-info/5',
+  warning: 'border-warning/30 bg-warning/5',
+  success: 'border-success/30 bg-success/5',
+  critical: 'border-destructive/30 bg-destructive/5',
+};
+
+const severityDot: Record<string, string> = {
+  info: 'bg-info',
+  warning: 'bg-warning',
+  success: 'bg-success',
+  critical: 'bg-destructive',
 };
 
 const ScenarioCard = ({ scenario, onDismiss }: { scenario: Scenario; onDismiss: () => void }) => {
-  const config = severityConfig[scenario.severity];
-  const Icon = config.icon;
+  const Icon = scenarioIcons[scenario.type] || Info;
   return (
-    <div className={`rounded-xl border p-4 ${config.className} animate-fade-in`}>
+    <div className={`rounded-xl border p-4 ${severityStyles[scenario.severity]} animate-fade-in hover:shadow-sm transition-shadow`}>
       <div className="flex items-start gap-3">
-        <Icon className="h-5 w-5 shrink-0 mt-0.5" style={{ color: `hsl(var(--${scenario.severity === 'critical' ? 'destructive' : scenario.severity}))` }} />
+        <div className={`h-8 w-8 rounded-full ${severityDot[scenario.severity]} flex items-center justify-center shrink-0`}>
+          <Icon className="h-4 w-4 text-card" />
+        </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h4 className="text-sm font-sans font-semibold text-foreground">{scenario.title}</h4>
-            <button onClick={onDismiss} className="text-muted-foreground hover:text-foreground transition-colors shrink-0">
+            <h4 className="text-sm font-semibold text-foreground">{scenario.title}</h4>
+            <button onClick={onDismiss} className="text-muted-foreground hover:text-foreground transition-colors shrink-0 mt-0.5">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
-          <p className="text-xs text-muted-foreground font-sans mt-1 leading-relaxed">{scenario.description}</p>
+          <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{scenario.description}</p>
           {scenario.actionLabel && (
-            <button className="text-xs text-accent font-sans font-medium mt-2 hover:underline underline-offset-2">
+            <button className="mt-2 text-xs font-semibold text-primary hover:underline underline-offset-2">
               {scenario.actionLabel} →
             </button>
           )}
@@ -43,7 +59,7 @@ const ScenarioCard = ({ scenario, onDismiss }: { scenario: Scenario; onDismiss: 
 const RoutineDashboard = () => {
   const {
     userProfile, activeRoutine, inventory, scenarios, weather,
-    dismissScenario, getProductById, checkReplenishment,
+    dismissScenario, getProductById, checkReplenishment, allRoutines, activateRoutine,
   } = useBeautyStore();
 
   const activeScenarios = scenarios.filter(s => s.active);
@@ -51,40 +67,74 @@ const RoutineDashboard = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero */}
-      <div className="relative h-[340px] overflow-hidden">
-        <img src={heroImage} alt="Beauty products" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/30 via-background/60 to-background" />
-        <div className="absolute inset-0 flex flex-col items-center justify-end pb-10 px-4">
-          <p className="text-sm font-sans text-muted-foreground mb-1">Welcome back, {userProfile.name}</p>
-          <h1 className="text-3xl md:text-4xl font-serif font-semibold text-foreground text-center mb-6">
-            Your Beauty Intelligence
-          </h1>
-          <SmartIntentBar />
+      <NykaaHeader />
+
+      {/* Hero Banner */}
+      <div className="relative h-[260px] overflow-hidden">
+        <img src={heroImage} alt="Beauty collection" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
+        <div className="absolute inset-0 flex items-center">
+          <div className="container">
+            <p className="text-xs uppercase tracking-[0.2em] text-primary-foreground/70 mb-2 font-medium">AI-Powered Beauty</p>
+            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground leading-tight">
+              Your Routine,<br />Intelligently Curated
+            </h2>
+            <p className="text-sm text-primary-foreground/80 mt-2 max-w-sm">
+              Smart routines, proactive alerts, and ingredient safety — all personalized for {userProfile.name}.
+            </p>
+            <div className="flex items-center gap-3 mt-4">
+              <span className="text-[10px] uppercase tracking-wider bg-primary/90 text-primary-foreground px-3 py-1 rounded-full font-semibold">
+                Skin: {userProfile.skinType}
+              </span>
+              <span className="text-[10px] uppercase tracking-wider bg-card/20 backdrop-blur text-primary-foreground px-3 py-1 rounded-full font-medium">
+                Shade: {userProfile.shadeMatch}
+              </span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto px-4 py-10 space-y-10">
-        {/* Weather Bar */}
-        <div className="flex items-center gap-6 rounded-xl border border-border bg-card p-4">
+      <div className="container py-8 space-y-8">
+        {/* Weather + Profile Strip */}
+        <div className="flex flex-wrap items-center gap-4 rounded-xl bg-muted p-4">
           <div className="flex items-center gap-2">
-            <Cloud className="h-5 w-5 text-info" />
-            <span className="text-sm font-sans text-foreground">{weather.condition}</span>
+            <Cloud className="h-4 w-4 text-info" />
+            <span className="text-xs font-medium text-foreground">{weather.condition}</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Droplets className="h-4 w-4 text-info" />
-            <span className="text-xs font-sans text-muted-foreground">Humidity {weather.humidity}%</span>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-1.5">
+            <Droplets className="h-3.5 w-3.5 text-info" />
+            <span className="text-xs text-muted-foreground">Humidity {weather.humidity}%</span>
           </div>
-          <div className="flex items-center gap-2">
-            <Sun className="h-4 w-4 text-warning" />
-            <span className="text-xs font-sans text-muted-foreground">UV Index {weather.uvIndex}</span>
+          <div className="flex items-center gap-1.5">
+            <Sun className="h-3.5 w-3.5 text-warning" />
+            <span className="text-xs text-muted-foreground">UV {weather.uvIndex}</span>
+          </div>
+          <div className="h-4 w-px bg-border" />
+          <div className="flex items-center gap-1.5">
+            <Shield className="h-3.5 w-3.5 text-destructive" />
+            <span className="text-xs text-muted-foreground">Blocked: {userProfile.allergies.join(', ')}</span>
+          </div>
+          <div className="ml-auto flex gap-1.5">
+            {userProfile.goals.map(g => (
+              <span key={g} className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">{g}</span>
+            ))}
           </div>
         </div>
 
-        {/* Alerts Grid */}
+        {/* Smart Intent Bar */}
+        <SmartIntentBar />
+
+        {/* Intelligence Feed */}
         {activeScenarios.length > 0 && (
           <section>
-            <h2 className="text-xl font-serif font-semibold text-foreground mb-4">Intelligence Feed</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-primary" />
+                Intelligence Feed
+                <span className="text-[10px] font-medium text-muted-foreground bg-muted px-2 py-0.5 rounded-full">{activeScenarios.length} active</span>
+              </h2>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {activeScenarios.map(s => (
                 <ScenarioCard key={s.id} scenario={s} onDismiss={() => dismissScenario(s.id)} />
@@ -93,71 +143,83 @@ const RoutineDashboard = () => {
           </section>
         )}
 
-        {/* Active Routine */}
-        {activeRoutine && (
-          <section>
-            <div className="flex items-baseline justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-serif font-semibold text-foreground">{activeRoutine.name}</h2>
-                <p className="text-sm text-muted-foreground font-sans mt-0.5">{activeRoutine.description}</p>
+        {/* Routine Tabs */}
+        <section>
+          <h2 className="text-lg font-bold text-foreground mb-4">Your Routines</h2>
+          <div className="flex gap-2 mb-5 overflow-x-auto pb-1">
+            {allRoutines.map(r => (
+              <button
+                key={r.id}
+                onClick={() => activateRoutine(r.id)}
+                className={`whitespace-nowrap px-4 py-2 rounded-full text-xs font-semibold transition-colors border ${
+                  activeRoutine?.id === r.id
+                    ? 'nykaa-gradient text-primary-foreground border-transparent'
+                    : 'bg-card text-foreground border-border hover:border-primary'
+                }`}
+              >
+                {r.name}
+              </button>
+            ))}
+          </div>
+
+          {activeRoutine && (
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[10px] uppercase tracking-wider bg-primary/10 text-primary px-3 py-1 rounded-full font-bold">
+                  Goal: {activeRoutine.goal}
+                </span>
+                <p className="text-xs text-muted-foreground">{activeRoutine.description}</p>
               </div>
-              <span className="text-xs font-sans px-3 py-1 rounded-full bg-accent/10 text-accent font-medium">
-                Goal: {activeRoutine.goal}
-              </span>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {activeRoutine.steps.map(step => {
-                const product = getProductById(step.productId);
-                if (!product) return null;
-                return (
-                  <div key={step.order} className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <span className="h-6 w-6 rounded-full bg-primary flex items-center justify-center text-xs text-primary-foreground font-sans font-bold">
-                        {step.order}
-                      </span>
-                      <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-sans">
-                        {step.timeOfDay}
-                      </span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {activeRoutine.steps.map(step => {
+                  const product = getProductById(step.productId);
+                  if (!product) return null;
+                  return (
+                    <div key={step.order} className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="h-6 w-6 rounded-full nykaa-gradient flex items-center justify-center text-[11px] text-primary-foreground font-bold">
+                          {step.order}
+                        </span>
+                        <span className="text-[10px] uppercase tracking-wider text-muted-foreground font-medium">
+                          {step.timeOfDay}
+                        </span>
+                      </div>
+                      <ProductCard product={product} reason={step.instruction} showGuard />
                     </div>
-                    <ProductCard
-                      product={product}
-                      reason={step.instruction}
-                      showGuard
-                    />
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </section>
-        )}
+          )}
+        </section>
 
         {/* Replenishment */}
         {lowStock.length > 0 && (
           <section>
-            <h2 className="text-xl font-serif font-semibold text-foreground mb-4">Replenishment Tracker</h2>
-            <div className="space-y-3">
+            <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+              <AlertTriangle className="h-5 w-5 text-warning" />
+              Replenishment Tracker
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {lowStock.map(item => {
                 const product = getProductById(item.productId);
                 if (!product) return null;
                 const daysLeft = Math.round(item.remainingPercent / item.usageRatePerDay);
                 return (
-                  <div key={item.productId} className="rounded-xl border border-warning/20 bg-warning/5 p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <p className="text-sm font-sans font-semibold text-foreground">{product.name}</p>
-                        <p className="text-xs text-muted-foreground font-sans">{product.brand} · ~{daysLeft} days left</p>
+                  <div key={item.productId} className="rounded-xl border border-warning/20 bg-warning/5 p-4 flex items-center gap-4">
+                    <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center text-lg font-bold text-warning shrink-0">
+                      {item.remainingPercent}%
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-foreground">{product.name}</p>
+                      <p className="text-xs text-muted-foreground">{product.brand} · ~{daysLeft} days left</p>
+                      <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden mt-2">
+                        <div className="h-full rounded-full bg-warning transition-all" style={{ width: `${item.remainingPercent}%` }} />
                       </div>
-                      <button className="text-xs font-sans font-medium text-accent hover:underline underline-offset-2">
-                        Reorder →
-                      </button>
                     </div>
-                    <div className="h-2 rounded-full bg-secondary overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-warning transition-all duration-500"
-                        style={{ width: `${item.remainingPercent}%` }}
-                      />
-                    </div>
-                    <p className="text-[11px] text-muted-foreground font-sans mt-1">{item.remainingPercent}% remaining</p>
+                    <button className="nykaa-gradient rounded-lg px-3 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity shrink-0">
+                      Reorder
+                    </button>
                   </div>
                 );
               })}
@@ -167,24 +229,24 @@ const RoutineDashboard = () => {
 
         {/* Inventory */}
         <section>
-          <h2 className="text-xl font-serif font-semibold text-foreground mb-4">Your Inventory</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <h2 className="text-lg font-bold text-foreground mb-4">Your Inventory</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {inventory.filter(i => i.remainingPercent >= 15).map(item => {
               const product = getProductById(item.productId);
               if (!product) return null;
               return (
-                <div key={item.productId} className="flex items-center gap-4 rounded-xl border border-border bg-card p-4">
-                  <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center text-sm font-serif text-secondary-foreground shrink-0">
+                <div key={item.productId} className="flex items-center gap-3 rounded-xl border border-border bg-card p-4 hover:shadow-sm transition-shadow">
+                  <div className="h-10 w-10 rounded-lg bg-secondary flex items-center justify-center text-sm font-bold text-secondary-foreground shrink-0">
                     {product.brand.charAt(0)}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-sans font-medium text-foreground truncate">{product.name}</p>
-                    <p className="text-xs text-muted-foreground font-sans">{product.brand}</p>
+                    <p className="text-sm font-semibold text-foreground truncate">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">{product.brand}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-sm font-sans font-semibold text-foreground">{item.remainingPercent}%</p>
-                    <div className="h-1.5 w-16 rounded-full bg-secondary overflow-hidden mt-1">
-                      <div className="h-full rounded-full bg-success transition-all" style={{ width: `${item.remainingPercent}%` }} />
+                    <p className="text-sm font-bold text-foreground">{item.remainingPercent}%</p>
+                    <div className="h-1.5 w-16 rounded-full bg-muted overflow-hidden mt-1">
+                      <div className="h-full rounded-full bg-success" style={{ width: `${item.remainingPercent}%` }} />
                     </div>
                   </div>
                 </div>
@@ -192,6 +254,14 @@ const RoutineDashboard = () => {
             })}
           </div>
         </section>
+
+        {/* Footer */}
+        <footer className="border-t border-border pt-8 pb-6 text-center">
+          <p className="text-xs text-muted-foreground">
+            Nykaa Beauty Intelligence Platform · AI-Powered Routines · Ingredient Safety · Smart Replenishment
+          </p>
+          <p className="text-[10px] text-muted-foreground/60 mt-1">Demo — embedded with 10 autonomous scenarios</p>
+        </footer>
       </div>
     </div>
   );

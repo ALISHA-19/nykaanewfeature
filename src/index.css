@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,42 +6,49 @@
 
 @layer base {
   :root {
-    --background: 40 20% 98%;
-    --foreground: 30 10% 12%;
+    --background: 0 0% 100%;
+    --foreground: 0 0% 13%;
 
-    --card: 40 25% 97%;
-    --card-foreground: 30 10% 12%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 30 10% 12%;
+    --popover-foreground: 0 0% 13%;
 
-    --primary: 30 8% 18%;
-    --primary-foreground: 40 20% 97%;
+    --primary: 334 100% 45%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 35 20% 93%;
-    --secondary-foreground: 30 10% 18%;
+    --secondary: 340 50% 96%;
+    --secondary-foreground: 334 100% 45%;
 
-    --muted: 35 15% 94%;
-    --muted-foreground: 30 8% 50%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 24 80% 55%;
+    --accent: 334 100% 45%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 35 15% 90%;
-    --input: 35 15% 90%;
-    --ring: 24 80% 55%;
+    --border: 0 0% 91%;
+    --input: 0 0% 91%;
+    --ring: 334 100% 45%;
 
-    --radius: 0.75rem;
+    --radius: 0.375rem;
 
     --success: 152 60% 42%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
-    --warning-foreground: 30 10% 12%;
+    --warning-foreground: 0 0% 13%;
     --info: 210 70% 55%;
     --info-foreground: 0 0% 100%;
+
+    --nykaa-pink: 334 100% 45%;
+    --nykaa-dark: 0 0% 13%;
+    --nykaa-gray: 0 0% 96%;
+    --nykaa-light-pink: 340 50% 96%;
+    --nykaa-gold: 40 80% 50%;
+    --nykaa-teal: 174 60% 40%;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -52,8 +59,8 @@
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
 
+    --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
     --font-serif: 'Playfair Display', Georgia, serif;
-    --font-sans: 'DM Sans', system-ui, sans-serif;
   }
 }
 
@@ -61,22 +68,23 @@
   * {
     @apply border-border;
   }
-
   body {
-    @apply bg-background text-foreground font-sans antialiased;
+    @apply bg-background text-foreground antialiased;
     font-family: var(--font-sans);
   }
+}
 
-  h1, h2, h3, h4 {
-    font-family: var(--font-serif);
+@layer components {
+  .nykaa-gradient {
+    background: linear-gradient(135deg, hsl(334 100% 45%), hsl(340 80% 55%));
+  }
+  .nykaa-ticker {
+    background: linear-gradient(90deg, hsl(174 60% 40%), hsl(174 50% 50%));
   }
 }
 
 @layer utilities {
   .font-serif {
     font-family: var(--font-serif);
-  }
-  .font-sans {
-    font-family: var(--font-sans);
   }
 }
