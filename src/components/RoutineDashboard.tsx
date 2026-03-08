@@ -264,41 +264,64 @@ const RoutineDashboard = () => {
         </section>
 
         {/* Replenishment */}
-        {lowStock.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
-              <AlertTriangle className="h-5 w-5 text-warning" />
-              Replenishment Tracker
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {lowStock.map(item => {
-                const product = getProductById(item.productId);
-                if (!product) return null;
-                const daysLeft = Math.round(item.remainingPercent / item.usageRatePerDay);
-                return (
-                  <div key={item.productId} className="rounded-xl border border-warning/20 bg-warning/5 p-4 flex items-center gap-4">
-                    <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center text-lg font-bold text-warning shrink-0">
-                      {item.remainingPercent}%
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold text-foreground">{product.name}</p>
-                      <p className="text-xs text-muted-foreground">{product.brand} · ~{daysLeft} days left</p>
-                      <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden mt-2">
-                        <div className="h-full rounded-full bg-warning transition-all" style={{ width: `${item.remainingPercent}%` }} />
-                      </div>
-                    </div>
-                    <button
-                      onClick={() => setReorderProductId(item.productId)}
-                      className="nykaa-gradient rounded-lg px-3 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity shrink-0"
-                    >
-                      Reorder
-                    </button>
+        <section>
+          <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-warning" />
+            Replenishment Tracker
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {lowStock.length > 0 ? lowStock.map(item => {
+              const product = getProductById(item.productId);
+              if (!product) return null;
+              const daysLeft = Math.round(item.remainingPercent / item.usageRatePerDay);
+              return (
+                <div key={item.productId} className="rounded-xl border border-warning/20 bg-warning/5 p-4 flex items-center gap-4">
+                  <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center text-lg font-bold text-warning shrink-0">
+                    {item.remainingPercent}%
                   </div>
-                );
-              })}
-            </div>
-          </section>
-        )}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{product.name}</p>
+                    <p className="text-xs text-muted-foreground">{product.brand} · ~{daysLeft} days left</p>
+                    <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden mt-2">
+                      <div className="h-full rounded-full bg-warning transition-all" style={{ width: `${item.remainingPercent}%` }} />
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => setReorderProductId(item.productId)}
+                    className="nykaa-gradient rounded-lg px-3 py-2 text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity shrink-0"
+                  >
+                    Reorder
+                  </button>
+                </div>
+              );
+            }) : null}
+            {reorderQueue.length > 0 && reorderQueue.map(productId => {
+              const product = getProductById(productId);
+              if (!product) return null;
+              const deliveryDate = new Date();
+              deliveryDate.setDate(deliveryDate.getDate() + 3);
+              const formattedDate = deliveryDate.toLocaleDateString('en-IN', { weekday: 'long', month: 'short', day: 'numeric' });
+              return (
+                <div key={productId} className="rounded-xl border border-success/30 bg-success/5 p-4 flex items-center gap-4 animate-fade-in">
+                  <div className="h-12 w-12 rounded-lg bg-success/10 flex items-center justify-center shrink-0">
+                    <CheckCircle2 className="h-6 w-6 text-success" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-foreground">{product.name}</p>
+                    <p className="text-xs text-success font-medium">Reordered ✓</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">Arriving {formattedDate}</p>
+                  </div>
+                  <span className="text-[10px] uppercase tracking-wider bg-success/10 text-success px-3 py-1 rounded-full font-bold shrink-0">
+                    On its way
+                  </span>
+                </div>
+              );
+            })}
+            {lowStock.length === 0 && reorderQueue.length === 0 && (
+              <p className="text-sm text-muted-foreground col-span-2">All products are well-stocked!</p>
+            )}
+          </div>
+        </section>
 
         {/* Inventory */}
         <section>
