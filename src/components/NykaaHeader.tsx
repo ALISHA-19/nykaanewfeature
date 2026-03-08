@@ -72,9 +72,20 @@ const NykaaHeader = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="nykaa-gradient rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity">
-            Sign in
-          </button>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-foreground flex items-center gap-1">
+                <User className="h-3.5 w-3.5" /> {profile?.full_name || 'User'}
+              </span>
+              <button onClick={signOut} className="text-muted-foreground hover:text-foreground transition-colors" title="Sign out">
+                <LogOut className="h-4 w-4" />
+              </button>
+            </div>
+          ) : (
+            <a href="/auth" className="nykaa-gradient rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity">
+              Sign in
+            </a>
+          )}
           <Heart className="h-5 w-5 text-foreground cursor-pointer hover:text-primary transition-colors" />
           <ShoppingBag className="h-5 w-5 text-foreground cursor-pointer hover:text-primary transition-colors" />
         </div>
