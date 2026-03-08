@@ -130,4 +130,78 @@ export const useBeautyStore = create<BeautyState>((set, get) => ({
   },
 
   getProductById: (id) => get().allProducts.find(p => p.id === id),
+
+  reorderProduct: (productId) => {
+    set(s => ({
+      reorderQueue: [...s.reorderQueue, productId],
+      inventory: s.inventory.map(item =>
+        item.productId === productId ? { ...item, remainingPercent: 100 } : item
+      ),
+    }));
+  },
+
+  swapProduct: (fromId, toId) => {
+    set(s => {
+      const newSwaps = { ...s.swappedProducts, [fromId]: toId };
+      // Update active routine steps to use the new product
+      const updatedRoutine = s.activeRoutine ? {
+        ...s.activeRoutine,
+        steps: s.activeRoutine.steps.map(step =>
+          step.productId === fromId ? { ...step, productId: toId } : step
+        ),
+      } : null;
+      return { swappedProducts: newSwaps, activeRoutine: updatedRoutine };
+    });
+  },
+
+  executeScenarioAction: (scenarioId) => {
+    const state = get();
+    const scenario = state.scenarios.find(s => s.id === scenarioId);
+    if (!scenario) return { action: 'none' };
+
+    switch (scenario.type) {
+      case 'swap': // Winter Dryness - swap gel to cream
+        state.swapProduct('p1', 'p2');
+        state.dismissScenario(scenarioId);
+        return { action: 'swap', data: { from: 'p1', to: 'p2' } };
+
+      case 'guard': // Allergy guard - show blocked product
+        return { action: 'guard', data: { productId: scenario.relatedProductIds[0] } };
+
+      case 'alert': // Sunscreen low - reorder
+        return { action: 'reorder', data: { productId: scenario.relatedProductIds[0] } };
+
+      case 'nudge': // Climate nudge - swap oils
+        state.swapProduct('p8', 'p9');
+        state.dismissScenario(scenarioId);
+        return { action: 'swap', data: { from: 'p8', to: 'p9' } };
+
+      case 'intent': // Date night
+        state.activateRoutine('r3');
+        state.dismissScenario(scenarioId);
+        return { action: 'routine', data: { routineId: 'r3' } };
+
+      case 'goal': // Acne goal
+        state.activateRoutine('r2');
+        state.dismissScenario(scenarioId);
+        return { action: 'routine', data: { routineId: 'r2' } };
+
+      case 'shade': // Shade match
+        return { action: 'shade', data: { shade: state.userProfile.shadeMatch } };
+
+      case 'conflict': // Ingredient conflict
+        return { action: 'conflict', data: { products: scenario.relatedProductIds } };
+
+      case 'budget': // Budget swap
+        return { action: 'budget', data: { from: 'p3', to: 'p4' } };
+
+      case 'calendar': // Wedding
+        state.activateRoutine('r1');
+        state.dismissScenario(scenarioId);
+        return { action: 'routine', data: { routineId: 'r1' } };
+
+      default:
+        return { action: 'none' };
+    }
+  },
 }));
