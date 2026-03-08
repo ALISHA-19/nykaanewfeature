@@ -73,7 +73,7 @@ const RoutineDashboard = () => {
   const {
     userProfile, activeRoutine, inventory, scenarios, weather,
     dismissScenario, getProductById, checkReplenishment, allRoutines, activateRoutine,
-    executeScenarioAction, swapProduct, reorderQueue,
+    executeScenarioAction, swapProduct, reorderQueue, actionedScenarios, markScenarioActioned,
   } = useBeautyStore();
 
   const activeScenarios = scenarios.filter(s => s.active);
@@ -94,6 +94,7 @@ const RoutineDashboard = () => {
         break;
       case 'reorder':
         setReorderProductId(result.data.productId);
+        markScenarioActioned(scenarioId, 'Reordered ✓');
         break;
       case 'guard':
         toast.error('Product Blocked', {
@@ -116,7 +117,6 @@ const RoutineDashboard = () => {
         toast.success('Budget swap applied!', {
           description: 'Switched to the affordable alternative. Same ingredients, better price.',
         });
-        dismissScenario('s9');
         break;
     }
   };
