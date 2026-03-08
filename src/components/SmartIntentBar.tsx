@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Sparkles, ArrowRight, Zap, Camera, Loader2, Sun, Moon, AlertTriangle, Lightbulb, X, Upload } from 'lucide-react';
+import { Sparkles, ArrowRight, Zap, Camera, Loader2, Sun, Moon, AlertTriangle, Lightbulb, X, Upload, Scissors, Droplets } from 'lucide-react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -11,7 +11,8 @@ interface RoutineStep {
   suggestion: string;
 }
 
-interface SkinAnalysis {
+interface BeautyAnalysis {
+  // Skin
   skinType: string;
   undertone: string;
   concerns: string[];
@@ -19,7 +20,16 @@ interface SkinAnalysis {
   shadeLabel: string;
   morningRoutine: RoutineStep[];
   nightRoutine: RoutineStep[];
-  tips: string[];
+  skinTips: string[];
+  // Hair
+  hairType: string;
+  hairTexture: string;
+  hairPorosity: string;
+  scalpType: string;
+  hairConcerns: string[];
+  hairCareRoutine: RoutineStep[];
+  hairStylingTips: RoutineStep[];
+  hairTips: string[];
 }
 
 const shadeColors: Record<string, string> = {
@@ -39,6 +49,10 @@ const suggestions = [
   { label: 'Wedding-ready in 10 days', icon: '💍' },
 ];
 
+type ResultSection = 'skin' | 'hair';
+type SkinTab = 'morning' | 'night';
+type HairTab = 'care' | 'styling';
+
 const SmartIntentBar = () => {
   const [value, setValue] = useState('');
   const [focused, setFocused] = useState(false);
@@ -46,13 +60,15 @@ const SmartIntentBar = () => {
   const [showUpload, setShowUpload] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [analysis, setAnalysis] = useState<SkinAnalysis | null>(null);
-  const [activeTab, setActiveTab] = useState<'morning' | 'night'>('morning');
+  const [analysis, setAnalysis] = useState<BeautyAnalysis | null>(null);
+  const [section, setSection] = useState<ResultSection>('skin');
+  const [skinTab, setSkinTab] = useState<SkinTab>('morning');
+  const [hairTab, setHairTab] = useState<HairTab>('care');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const processIntent = useBeautyStore(s => s.processIntent);
 
   const handleSubmit = (q: string) => {
-    const finalGoal = q.trim() || 'Personalized skin analysis';
+    const finalGoal = q.trim() || 'Personalized skin & hair analysis';
     processIntent(finalGoal);
     setGoal(finalGoal);
     setValue('');
@@ -70,9 +86,7 @@ const SmartIntentBar = () => {
       return;
     }
     const reader = new FileReader();
-    reader.onload = () => {
-      setPreview(reader.result as string);
-    };
+    reader.onload = () => setPreview(reader.result as string);
     reader.readAsDataURL(file);
   };
 
@@ -93,7 +107,7 @@ const SmartIntentBar = () => {
         setLoading(false);
         return;
       }
-      setAnalysis(data as SkinAnalysis);
+      setAnalysis(data as BeautyAnalysis);
     } catch {
       toast.error('Something went wrong');
     }
@@ -106,6 +120,7 @@ const SmartIntentBar = () => {
     setAnalysis(null);
     setGoal('');
     setLoading(false);
+    setSection('skin');
   };
 
   const shadeColor = analysis ? (shadeColors[analysis.foundationShade] || '#D4A574') : '#D4A574';
@@ -127,7 +142,7 @@ const SmartIntentBar = () => {
           )}
         </div>
 
-        {/* Input bar — shown when not in upload/results mode */}
+        {/* Input bar */}
         {!showUpload && !analysis && (
           <>
             <div className={`flex items-center gap-2 rounded-lg border bg-card px-4 py-3 transition-all ${focused ? 'border-primary shadow-md shadow-primary/10' : 'border-border'}`}>
@@ -169,18 +184,11 @@ const SmartIntentBar = () => {
             <div className="rounded-lg bg-primary/5 border border-primary/20 px-4 py-2.5 flex items-center gap-2">
               <Sparkles className="h-3.5 w-3.5 text-primary shrink-0" />
               <p className="text-xs text-foreground">
-                Goal: <span className="font-semibold text-primary">{goal}</span> — Upload a selfie so our AI can analyze your skin and build a personalized routine.
+                Goal: <span className="font-semibold text-primary">{goal}</span> — Upload a selfie so our AI can analyze your skin & hair and build personalized routines.
               </p>
             </div>
 
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              capture="user"
-              className="hidden"
-              onChange={handleFileChange}
-            />
+            <input ref={fileInputRef} type="file" accept="image/*" capture="user" className="hidden" onChange={handleFileChange} />
 
             {!preview ? (
               <button
@@ -201,10 +209,7 @@ const SmartIntentBar = () => {
                 <div className="flex-1 space-y-2">
                   <p className="text-sm font-semibold text-foreground">Photo ready!</p>
                   <div className="flex gap-2">
-                    <button
-                      onClick={() => setPreview(null)}
-                      className="px-3 py-1.5 rounded-lg border border-border text-[11px] font-medium text-foreground hover:bg-muted transition-colors"
-                    >
+                    <button onClick={() => setPreview(null)} className="px-3 py-1.5 rounded-lg border border-border text-[11px] font-medium text-foreground hover:bg-muted transition-colors">
                       Change
                     </button>
                     <button
@@ -212,11 +217,7 @@ const SmartIntentBar = () => {
                       disabled={loading}
                       className="nykaa-gradient px-5 py-1.5 rounded-lg text-[11px] font-semibold text-primary-foreground hover:opacity-90 transition-opacity flex items-center gap-1.5 disabled:opacity-50"
                     >
-                      {loading ? (
-                        <><Loader2 className="h-3 w-3 animate-spin" /> Analyzing...</>
-                      ) : (
-                        <><Sparkles className="h-3 w-3" /> Analyze My Skin</>
-                      )}
+                      {loading ? <><Loader2 className="h-3 w-3 animate-spin" /> Analyzing...</> : <><Sparkles className="h-3 w-3" /> Analyze My Skin & Hair</>}
                     </button>
                   </div>
                 </div>
@@ -227,8 +228,8 @@ const SmartIntentBar = () => {
               <div className="flex items-center gap-3 rounded-lg bg-muted px-4 py-3">
                 <Loader2 className="h-4 w-4 animate-spin text-primary shrink-0" />
                 <div>
-                  <p className="text-xs font-medium text-foreground">AI is analyzing your skin...</p>
-                  <p className="text-[11px] text-muted-foreground">Detecting skin type, undertone, concerns & shade match</p>
+                  <p className="text-xs font-medium text-foreground">AI is analyzing your skin & hair...</p>
+                  <p className="text-[11px] text-muted-foreground">Detecting skin type, undertone, hair type, porosity, concerns & routines</p>
                 </div>
               </div>
             )}
@@ -246,103 +247,166 @@ const SmartIntentBar = () => {
               </p>
             </div>
 
-            {/* Summary row */}
-            <div className="flex items-start gap-4">
-              {preview && (
-                <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-border shrink-0">
-                  <img src={preview} alt="Your photo" className="w-full h-full object-cover" />
-                </div>
-              )}
-              <div className="flex-1">
-                <h4 className="text-sm font-bold text-foreground">Your Skin Profile</h4>
-                <div className="flex flex-wrap gap-1.5 mt-1.5">
-                  <span className="text-[10px] uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">
-                    {analysis.skinType} Skin
-                  </span>
-                  <span className="text-[10px] uppercase tracking-wider bg-info/10 text-info px-2 py-0.5 rounded-full font-bold">
-                    {analysis.undertone} Undertone
-                  </span>
-                </div>
-              </div>
-              {/* Foundation swatch */}
-              <div className="flex items-center gap-2.5 shrink-0">
-                <div
-                  className="h-10 w-10 rounded-full border-2 border-card shadow-md"
-                  style={{ backgroundColor: shadeColor }}
-                />
-                <div>
-                  <p className="text-xs font-bold text-foreground">MAC {analysis.foundationShade}</p>
-                  <p className="text-[10px] text-muted-foreground">{analysis.shadeLabel}</p>
-                </div>
-              </div>
+            {/* Section toggle: Skin vs Hair */}
+            <div className="flex gap-2">
+              <button
+                onClick={() => setSection('skin')}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-colors ${
+                  section === 'skin' ? 'nykaa-gradient text-primary-foreground' : 'bg-card border border-border text-foreground hover:border-primary'
+                }`}
+              >
+                <Droplets className="h-3.5 w-3.5" /> Skin Analysis
+              </button>
+              <button
+                onClick={() => setSection('hair')}
+                className={`flex items-center gap-1.5 px-4 py-2 rounded-full text-xs font-semibold transition-colors ${
+                  section === 'hair' ? 'nykaa-gradient text-primary-foreground' : 'bg-card border border-border text-foreground hover:border-primary'
+                }`}
+              >
+                <Scissors className="h-3.5 w-3.5" /> Hair Analysis
+              </button>
             </div>
 
-            {/* Concerns */}
-            <div className="flex flex-wrap gap-1.5">
-              {analysis.concerns.map(c => (
-                <span key={c} className="text-[11px] px-2.5 py-1 rounded-full bg-warning/10 text-warning font-medium flex items-center gap-1">
-                  <AlertTriangle className="h-3 w-3" /> {c}
-                </span>
-              ))}
-            </div>
-
-            {/* Routines */}
-            <div>
-              <div className="flex gap-2 mb-3">
-                <button
-                  onClick={() => setActiveTab('morning')}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${
-                    activeTab === 'morning'
-                      ? 'nykaa-gradient text-primary-foreground'
-                      : 'bg-card border border-border text-foreground hover:border-primary'
-                  }`}
-                >
-                  <Sun className="h-3 w-3" /> Morning
-                </button>
-                <button
-                  onClick={() => setActiveTab('night')}
-                  className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${
-                    activeTab === 'night'
-                      ? 'nykaa-gradient text-primary-foreground'
-                      : 'bg-card border border-border text-foreground hover:border-primary'
-                  }`}
-                >
-                  <Moon className="h-3 w-3" /> Night
-                </button>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                {(activeTab === 'morning' ? analysis.morningRoutine : analysis.nightRoutine).map(step => (
-                  <div key={step.step} className="flex items-start gap-2.5 rounded-lg border border-border bg-card p-3 hover:shadow-sm transition-shadow">
-                    <span className="h-6 w-6 rounded-full nykaa-gradient flex items-center justify-center text-[10px] text-primary-foreground font-bold shrink-0 mt-0.5">
-                      {step.step}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-foreground">{step.product}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">{step.reason}</p>
-                      <p className="text-[11px] text-primary font-medium mt-0.5">→ {step.suggestion}</p>
+            {/* ── SKIN SECTION ── */}
+            {section === 'skin' && (
+              <div className="space-y-5 animate-fade-in">
+                {/* Summary row */}
+                <div className="flex items-start gap-4">
+                  {preview && (
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-border shrink-0">
+                      <img src={preview} alt="Your photo" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <h4 className="text-sm font-bold text-foreground">Skin Profile</h4>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      <span className="text-[10px] uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">{analysis.skinType} Skin</span>
+                      <span className="text-[10px] uppercase tracking-wider bg-info/10 text-info px-2 py-0.5 rounded-full font-bold">{analysis.undertone} Undertone</span>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                  <div className="flex items-center gap-2.5 shrink-0">
+                    <div className="h-10 w-10 rounded-full border-2 border-card shadow-md" style={{ backgroundColor: shadeColor }} />
+                    <div>
+                      <p className="text-xs font-bold text-foreground">MAC {analysis.foundationShade}</p>
+                      <p className="text-[10px] text-muted-foreground">{analysis.shadeLabel}</p>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Tips */}
-            <div className="rounded-lg border border-success/20 bg-success/5 p-3 space-y-1.5">
-              <p className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
-                <Lightbulb className="h-3.5 w-3.5 text-success" /> Personalized Tips
-              </p>
-              {analysis.tips.map((tip, i) => (
-                <p key={i} className="text-[11px] text-muted-foreground pl-5">• {tip}</p>
-              ))}
-            </div>
+                {/* Concerns */}
+                <div className="flex flex-wrap gap-1.5">
+                  {analysis.concerns.map(c => (
+                    <span key={c} className="text-[11px] px-2.5 py-1 rounded-full bg-warning/10 text-warning font-medium flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" /> {c}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Routines */}
+                <div>
+                  <div className="flex gap-2 mb-3">
+                    <button onClick={() => setSkinTab('morning')} className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${skinTab === 'morning' ? 'nykaa-gradient text-primary-foreground' : 'bg-card border border-border text-foreground hover:border-primary'}`}>
+                      <Sun className="h-3 w-3" /> Morning
+                    </button>
+                    <button onClick={() => setSkinTab('night')} className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${skinTab === 'night' ? 'nykaa-gradient text-primary-foreground' : 'bg-card border border-border text-foreground hover:border-primary'}`}>
+                      <Moon className="h-3 w-3" /> Night
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {(skinTab === 'morning' ? analysis.morningRoutine : analysis.nightRoutine).map(step => (
+                      <div key={step.step} className="flex items-start gap-2.5 rounded-lg border border-border bg-card p-3 hover:shadow-sm transition-shadow">
+                        <span className="h-6 w-6 rounded-full nykaa-gradient flex items-center justify-center text-[10px] text-primary-foreground font-bold shrink-0 mt-0.5">{step.step}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-foreground">{step.product}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{step.reason}</p>
+                          <p className="text-[11px] text-primary font-medium mt-0.5">→ {step.suggestion}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tips */}
+                <div className="rounded-lg border border-success/20 bg-success/5 p-3 space-y-1.5">
+                  <p className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                    <Lightbulb className="h-3.5 w-3.5 text-success" /> Skin Tips
+                  </p>
+                  {(analysis.skinTips || []).map((tip, i) => (
+                    <p key={i} className="text-[11px] text-muted-foreground pl-5">• {tip}</p>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* ── HAIR SECTION ── */}
+            {section === 'hair' && (
+              <div className="space-y-5 animate-fade-in">
+                {/* Summary */}
+                <div className="flex items-start gap-4">
+                  {preview && (
+                    <div className="w-16 h-16 rounded-xl overflow-hidden border-2 border-border shrink-0">
+                      <img src={preview} alt="Your photo" className="w-full h-full object-cover" />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <h4 className="text-sm font-bold text-foreground">Hair Profile</h4>
+                    <div className="flex flex-wrap gap-1.5 mt-1.5">
+                      <span className="text-[10px] uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-full font-bold">{analysis.hairType}</span>
+                      <span className="text-[10px] uppercase tracking-wider bg-info/10 text-info px-2 py-0.5 rounded-full font-bold">{analysis.hairTexture} Texture</span>
+                      <span className="text-[10px] uppercase tracking-wider bg-warning/10 text-warning px-2 py-0.5 rounded-full font-bold">{analysis.hairPorosity} Porosity</span>
+                      <span className="text-[10px] uppercase tracking-wider bg-success/10 text-success px-2 py-0.5 rounded-full font-bold">{analysis.scalpType} Scalp</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Hair concerns */}
+                <div className="flex flex-wrap gap-1.5">
+                  {(analysis.hairConcerns || []).map(c => (
+                    <span key={c} className="text-[11px] px-2.5 py-1 rounded-full bg-warning/10 text-warning font-medium flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" /> {c}
+                    </span>
+                  ))}
+                </div>
+
+                {/* Hair routines */}
+                <div>
+                  <div className="flex gap-2 mb-3">
+                    <button onClick={() => setHairTab('care')} className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${hairTab === 'care' ? 'nykaa-gradient text-primary-foreground' : 'bg-card border border-border text-foreground hover:border-primary'}`}>
+                      <Droplets className="h-3 w-3" /> Hair Care Routine
+                    </button>
+                    <button onClick={() => setHairTab('styling')} className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-colors ${hairTab === 'styling' ? 'nykaa-gradient text-primary-foreground' : 'bg-card border border-border text-foreground hover:border-primary'}`}>
+                      <Scissors className="h-3 w-3" /> Styling Tips
+                    </button>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {(hairTab === 'care' ? (analysis.hairCareRoutine || []) : (analysis.hairStylingTips || [])).map(step => (
+                      <div key={step.step} className="flex items-start gap-2.5 rounded-lg border border-border bg-card p-3 hover:shadow-sm transition-shadow">
+                        <span className="h-6 w-6 rounded-full nykaa-gradient flex items-center justify-center text-[10px] text-primary-foreground font-bold shrink-0 mt-0.5">{step.step}</span>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs font-semibold text-foreground">{step.product}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{step.reason}</p>
+                          <p className="text-[11px] text-primary font-medium mt-0.5">→ {step.suggestion}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Hair tips */}
+                <div className="rounded-lg border border-success/20 bg-success/5 p-3 space-y-1.5">
+                  <p className="text-[11px] font-bold text-foreground flex items-center gap-1.5">
+                    <Lightbulb className="h-3.5 w-3.5 text-success" /> Hair Tips
+                  </p>
+                  {(analysis.hairTips || []).map((tip, i) => (
+                    <p key={i} className="text-[11px] text-muted-foreground pl-5">• {tip}</p>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="flex gap-2">
-              <button
-                onClick={reset}
-                className="flex-1 py-2.5 rounded-lg border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors"
-              >
+              <button onClick={reset} className="flex-1 py-2.5 rounded-lg border border-border text-xs font-semibold text-foreground hover:bg-muted transition-colors">
                 Try Another Goal
               </button>
               <button
