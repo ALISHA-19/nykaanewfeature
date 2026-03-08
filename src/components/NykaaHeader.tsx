@@ -2,7 +2,9 @@ import { Search, ShoppingBag, User, Heart, MapPin, Gift, HelpCircle, Smartphone 
 import { useState } from 'react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 
-const categories = ['Makeup', 'Skin', 'Hair', 'Bath & Body', 'Natural', 'Mom & Baby', 'Health & Wellness', 'Fragrance', 'Appliances'];
+import { nykaaCategories } from '@/data/mockDatabase';
+
+const categories = nykaaCategories;
 
 const NykaaHeader = () => {
   const [searchValue, setSearchValue] = useState('');
