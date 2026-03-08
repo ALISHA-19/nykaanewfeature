@@ -1,4 +1,5 @@
 import { Search, ShoppingBag, Heart, MapPin, Gift, HelpCircle, Smartphone, ChevronDown, X } from 'lucide-react';
+import nykaaLogo from '@/assets/nykaa-logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 import { nykaaCategories, type NykaaCategory } from '@/data/mockDatabase';
