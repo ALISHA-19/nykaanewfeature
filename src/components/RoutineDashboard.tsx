@@ -14,6 +14,7 @@ import type { Scenario } from '@/data/mockDatabase';
 import heroImage from '@/assets/hero-beauty.jpg';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
 
 const scenarioIcons: Record<string, typeof Info> = {
   swap: ThermometerSun, alert: AlertTriangle, guard: Shield, nudge: Cloud,
