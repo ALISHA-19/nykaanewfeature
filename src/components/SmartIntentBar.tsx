@@ -52,9 +52,9 @@ const SmartIntentBar = () => {
   const processIntent = useBeautyStore(s => s.processIntent);
 
   const handleSubmit = (q: string) => {
-    if (!q.trim()) return;
-    processIntent(q);
-    setGoal(q);
+    const finalGoal = q.trim() || 'Personalized skin analysis';
+    processIntent(finalGoal);
+    setGoal(finalGoal);
     setValue('');
     setFocused(false);
     setShowUpload(true);
