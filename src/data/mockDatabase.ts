@@ -67,6 +67,7 @@ export const products: Product[] = [
     id: 'p1', name: 'Hydra Gel Cleanser', brand: 'CeraVe', category: 'cleanser', nykaaCategory: 'Skin',
     ingredients: ['Hyaluronic Acid', 'Ceramides', 'Glycerin'],
     price: 16, tier: 'budget', skinTypes: ['oily', 'combination'], concerns: ['hydration'],
+    imageUrl: 'https://images-static.nykaa.com/media/catalog/product/8/c/8c5e5a4CERAV00000018_1.jpg?tr=w-344,h-344,cm-pad_resize',
     description: 'Lightweight gel cleanser that maintains skin barrier.',
   },
   {
