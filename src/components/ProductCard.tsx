@@ -27,9 +27,13 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
   if (compact) {
     return (
       <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 hover:shadow-sm transition-shadow">
-        <div className="h-12 w-12 rounded-lg bg-secondary flex items-center justify-center text-base font-bold text-secondary-foreground shrink-0">
-          {product.brand.charAt(0)}
-        </div>
+        {product.imageUrl ? (
+          <img src={product.imageUrl} alt={product.name} className="h-12 w-12 rounded-lg object-contain shrink-0" />
+        ) : (
+          <div className="h-12 w-12 rounded-lg bg-secondary flex items-center justify-center text-base font-bold text-secondary-foreground shrink-0">
+            {product.brand.charAt(0)}
+          </div>
+        )}
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-foreground truncate">{product.name}</p>
           <p className="text-xs text-muted-foreground">{product.brand} · <span className="font-semibold text-primary">₹{(product.price * 83).toLocaleString()}</span></p>
@@ -43,9 +47,13 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden hover:shadow-md transition-shadow group animate-fade-in">
-      {/* Product image placeholder */}
-      <div className="h-44 bg-gradient-to-br from-secondary to-muted flex items-center justify-center relative">
-        <span className="text-4xl font-serif font-bold text-primary/20">{product.brand.charAt(0)}{product.brand.charAt(1)}</span>
+      {/* Product image */}
+      <div className="h-44 bg-gradient-to-br from-secondary to-muted flex items-center justify-center relative overflow-hidden">
+        {product.imageUrl ? (
+          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain p-2" />
+        ) : (
+          <span className="text-4xl font-serif font-bold text-primary/20">{product.brand.charAt(0)}{product.brand.charAt(1)}</span>
+        )}
         <span className={`absolute top-3 left-3 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded ${tierBadge[product.tier]}`}>
           {product.tier}
         </span>
