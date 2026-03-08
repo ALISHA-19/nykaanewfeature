@@ -212,6 +212,7 @@ const RoutineDashboard = () => {
                   scenario={s}
                   onDismiss={() => dismissScenario(s.id)}
                   onAction={() => handleScenarioAction(s.id)}
+                  actionedLabel={actionedScenarios[s.id]}
                 />
               ))}
             </div>
