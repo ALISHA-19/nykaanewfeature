@@ -12,6 +12,10 @@ export interface Product {
   nykaaCategory: NykaaCategory;
   ingredients: string[];
   price: number;
+  mrp: number;
+  rating: number;
+  ratingCount: number;
+  reviewCount: number;
   tier: 'budget' | 'mid' | 'luxury';
   skinTypes: string[];
   concerns: string[];
