@@ -23,12 +23,14 @@ interface BeautyState {
   weather: WeatherData;
   intentQuery: string;
   reorderQueue: string[];
-  swappedProducts: Record<string, string>; // originalId -> newId
+  swappedProducts: Record<string, string>;
+  actionedScenarios: Record<string, string>; // scenarioId -> status label
 
   setIntentQuery: (q: string) => void;
   processIntent: (q: string) => void;
   activateRoutine: (routineId: string) => void;
   dismissScenario: (scenarioId: string) => void;
+  markScenarioActioned: (scenarioId: string, label: string) => void;
   checkReplenishment: () => InventoryItem[];
   validateIngredients: (productId: string) => { safe: boolean; reason?: string };
   recommendAlternatives: (productId: string) => Product[];
@@ -64,6 +66,7 @@ export const useBeautyStore = create<BeautyState>((set, get) => ({
   intentQuery: '',
   reorderQueue: [],
   swappedProducts: {},
+  actionedScenarios: {},
 
   setIntentQuery: (q) => set({ intentQuery: q }),
 
@@ -90,6 +93,10 @@ export const useBeautyStore = create<BeautyState>((set, get) => ({
 
   dismissScenario: (scenarioId) => {
     set(s => ({ scenarios: s.scenarios.map(sc => sc.id === scenarioId ? { ...sc, active: false } : sc) }));
+  },
+
+  markScenarioActioned: (scenarioId, label) => {
+    set(s => ({ actionedScenarios: { ...s.actionedScenarios, [scenarioId]: label } }));
   },
 
   checkReplenishment: () => {
