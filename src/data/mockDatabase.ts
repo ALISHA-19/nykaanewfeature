@@ -299,7 +299,7 @@ export const products: Product[] = [
     id: 'f1', name: 'Black Opium EDP', brand: 'YSL', category: 'perfume', nykaaCategory: 'Fragrance',
     ingredients: ['Black Coffee', 'White Flowers', 'Vanilla'],
     price: 95, tier: 'luxury', skinTypes: ['all'], concerns: ['fragrance'],
-    description: 'Rock'n'roll meets sweetness — addictive coffee-vanilla scent.',
+    description: "Rock'n'roll meets sweetness — addictive coffee-vanilla scent.",
   },
   {
     id: 'f2', name: 'Sauvage EDT', brand: 'Dior', category: 'perfume', nykaaCategory: 'Fragrance',
