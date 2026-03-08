@@ -1,12 +1,13 @@
-import { Search, ShoppingBag, User, Heart, MapPin, Gift, HelpCircle, Smartphone } from 'lucide-react';
-import { useState } from 'react';
+import { Search, ShoppingBag, Heart, MapPin, Gift, HelpCircle, Smartphone, ChevronDown, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 import { nykaaCategories, type NykaaCategory } from '@/data/mockDatabase';
 import { categoryDropdowns } from '@/data/categoryData';
 
 const NykaaHeader = () => {
   const [searchValue, setSearchValue] = useState('');
-  const [hoveredCat, setHoveredCat] = useState<NykaaCategory | null>(null);
+  const [openCat, setOpenCat] = useState<NykaaCategory | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   const processIntent = useBeautyStore(s => s.processIntent);
 
   const handleSearch = () => {
@@ -15,6 +16,17 @@ const NykaaHeader = () => {
       setSearchValue('');
     }
   };
+
+  // Close on click outside
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setOpenCat(null);
+      }
+    };
+    if (openCat) document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [openCat]);
 
   return (
     <header className="sticky top-0 z-50 bg-card shadow-sm">
@@ -67,55 +79,60 @@ const NykaaHeader = () => {
         </div>
       </div>
 
-      {/* Category bar with mega-menu */}
-      <div className="border-t border-border bg-card relative">
+      {/* Category bar */}
+      <div className="border-t border-border bg-card" ref={dropdownRef}>
         <div className="container flex items-center gap-0 overflow-x-auto">
           {nykaaCategories.map(cat => (
-            <div
+            <button
               key={cat}
-              className="relative"
-              onMouseEnter={() => setHoveredCat(cat)}
-              onMouseLeave={() => setHoveredCat(null)}
+              onClick={() => setOpenCat(openCat === cat ? null : cat)}
+              className={`text-xs font-medium whitespace-nowrap px-4 py-2.5 transition-colors border-b-2 ${
+                openCat === cat
+                  ? 'text-primary border-primary'
+                  : 'text-foreground border-transparent hover:text-primary'
+              }`}
             >
-              <button
-                className={`text-xs font-medium whitespace-nowrap px-4 py-2.5 transition-colors border-b-2 ${
-                  hoveredCat === cat
-                    ? 'text-primary border-primary'
-                    : 'text-foreground border-transparent hover:text-primary'
-                }`}
-              >
-                {cat}
-              </button>
-
-              {/* Mega dropdown */}
-              {hoveredCat === cat && categoryDropdowns[cat] && (
-                <div
-                  className="absolute left-0 top-full w-[600px] max-w-[90vw] bg-card border border-border rounded-b-xl shadow-lg z-50 p-5 grid gap-6 animate-fade-in"
-                  style={{
-                    gridTemplateColumns: `repeat(${Math.min(categoryDropdowns[cat].length, 3)}, 1fr)`,
-                  }}
-                  onMouseEnter={() => setHoveredCat(cat)}
-                  onMouseLeave={() => setHoveredCat(null)}
-                >
-                  {categoryDropdowns[cat].map(sub => (
-                    <div key={sub.name}>
-                      <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-2">{sub.name}</h4>
-                      <ul className="space-y-1.5">
-                        {sub.items.map(item => (
-                          <li key={item}>
-                            <button className="text-xs text-muted-foreground hover:text-primary transition-colors w-full text-left">
-                              {item}
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+              {cat}
+            </button>
           ))}
         </div>
+
+        {/* Full-width mega dropdown */}
+        {openCat && categoryDropdowns[openCat] && (
+          <div className="absolute left-0 right-0 bg-card border-t border-border shadow-xl z-50 animate-fade-in">
+            <div className="container py-6">
+              <div className="flex items-center justify-between mb-5">
+                <h3 className="text-sm font-bold text-foreground">{openCat}</h3>
+                <button onClick={() => setOpenCat(null)} className="text-muted-foreground hover:text-foreground transition-colors">
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div
+                className="grid gap-8"
+                style={{
+                  gridTemplateColumns: `repeat(${Math.min(categoryDropdowns[openCat].length, 5)}, 1fr)`,
+                }}
+              >
+                {categoryDropdowns[openCat].map(sub => (
+                  <div key={sub.name}>
+                    <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-3 pb-2 border-b border-border">
+                      {sub.name}
+                    </h4>
+                    <ul className="space-y-2">
+                      {sub.items.map(item => (
+                        <li key={item}>
+                          <button className="text-xs text-muted-foreground hover:text-primary hover:translate-x-0.5 transition-all w-full text-left">
+                            {item}
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Ticker */}
