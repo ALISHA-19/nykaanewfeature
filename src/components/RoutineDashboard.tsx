@@ -68,7 +68,7 @@ const RoutineDashboard = () => {
   const {
     userProfile, activeRoutine, inventory, scenarios, weather,
     dismissScenario, getProductById, checkReplenishment, allRoutines, activateRoutine,
-    executeScenarioAction, swapProduct,
+    executeScenarioAction, swapProduct, reorderQueue,
   } = useBeautyStore();
 
   const activeScenarios = scenarios.filter(s => s.active);
