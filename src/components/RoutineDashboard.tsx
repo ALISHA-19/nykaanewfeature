@@ -196,6 +196,9 @@ const RoutineDashboard = () => {
         {/* Smart Intent Bar */}
         <SmartIntentBar />
 
+        {/* Category Browser */}
+        <CategoryBrowser />
+
         {/* Intelligence Feed */}
         {activeScenarios.length > 0 && (
           <section>
