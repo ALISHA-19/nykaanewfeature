@@ -152,7 +152,7 @@ const RoutineDashboard = () => {
               Your Routine,<br />Intelligently Curated
             </h2>
             <p className="text-sm text-primary-foreground/80 mt-2 max-w-sm">
-              Smart routines, proactive alerts, and ingredient safety — all personalized for {userProfile.name}.
+              Smart routines, proactive alerts, and ingredient safety — all personalized for {displayName}.
             </p>
             <div className="flex items-center gap-3 mt-4">
               <span className="text-[10px] uppercase tracking-wider bg-primary/90 text-primary-foreground px-3 py-1 rounded-full font-semibold">
