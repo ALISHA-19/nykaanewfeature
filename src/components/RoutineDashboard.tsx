@@ -194,7 +194,7 @@ const RoutineDashboard = () => {
         </div>
 
         {/* Smart Intent Bar */}
-        <SmartIntentBar onOpenMirror={() => setShowMirror(true)} />
+        <SmartIntentBar />
 
         {/* Category Browser */}
         <CategoryBrowser />
