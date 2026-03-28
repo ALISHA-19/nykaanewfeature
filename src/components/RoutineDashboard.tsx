@@ -138,25 +138,25 @@ const RoutineDashboard = () => {
       )}
 
       {/* Hero Banner */}
-      <div className="relative h-[260px] overflow-hidden">
+      <div className="relative h-[180px] sm:h-[260px] overflow-hidden">
         <img src={heroImage} alt="Beauty collection" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/50 to-transparent sm:from-foreground/70 sm:via-foreground/40" />
         <div className="absolute inset-0 flex items-center">
-          <div className="container">
-            <p className="text-xs uppercase tracking-[0.2em] text-primary-foreground/70 mb-2 font-medium">AI-Powered Beauty</p>
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground leading-tight">
+          <div className="container px-4 sm:px-8">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-primary-foreground/70 mb-1 sm:mb-2 font-medium">AI-Powered Beauty</p>
+            <h2 className="text-xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-foreground leading-tight">
               Your Routine,<br />Intelligently Curated
             </h2>
-            <p className="text-sm text-primary-foreground/80 mt-2 max-w-sm">
+            <p className="text-xs sm:text-sm text-primary-foreground/80 mt-1 sm:mt-2 max-w-sm hidden sm:block">
               Smart routines, proactive alerts, and ingredient safety — all personalized for {userProfile.name}.
             </p>
-            <div className="flex items-center gap-3 mt-4">
-              <span className="text-[10px] uppercase tracking-wider bg-primary/90 text-primary-foreground px-3 py-1 rounded-full font-semibold">
+            <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-4">
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-wider bg-primary/90 text-primary-foreground px-2 sm:px-3 py-1 rounded-full font-semibold">
                 Skin: {userProfile.skinType}
               </span>
               <button
                 onClick={() => setShowMirror(true)}
-                className="text-[10px] uppercase tracking-wider bg-card/20 backdrop-blur text-primary-foreground px-3 py-1 rounded-full font-medium hover:bg-card/30 transition-colors cursor-pointer"
+                className="text-[9px] sm:text-[10px] uppercase tracking-wider bg-card/20 backdrop-blur text-primary-foreground px-2 sm:px-3 py-1 rounded-full font-medium hover:bg-card/30 transition-colors cursor-pointer"
               >
                 Shade: {userProfile.shadeMatch} ✨
               </button>
@@ -165,14 +165,14 @@ const RoutineDashboard = () => {
         </div>
       </div>
 
-      <div className="container py-8 space-y-8">
+      <div className="container px-4 sm:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8">
         {/* Weather + Profile Strip */}
-        <div className="flex flex-wrap items-center gap-4 rounded-xl bg-muted p-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 rounded-xl bg-muted p-3 sm:p-4">
           <div className="flex items-center gap-2">
             <Cloud className="h-4 w-4 text-info" />
             <span className="text-xs font-medium text-foreground">{weather.condition}</span>
           </div>
-          <div className="h-4 w-px bg-border" />
+          <div className="h-4 w-px bg-border hidden sm:block" />
           <div className="flex items-center gap-1.5">
             <Droplets className="h-3.5 w-3.5 text-info" />
             <span className="text-xs text-muted-foreground">Humidity {weather.humidity}%</span>
@@ -181,12 +181,12 @@ const RoutineDashboard = () => {
             <Sun className="h-3.5 w-3.5 text-warning" />
             <span className="text-xs text-muted-foreground">UV {weather.uvIndex}</span>
           </div>
-          <div className="h-4 w-px bg-border" />
+          <div className="h-4 w-px bg-border hidden sm:block" />
           <div className="flex items-center gap-1.5">
             <Shield className="h-3.5 w-3.5 text-destructive" />
             <span className="text-xs text-muted-foreground">Blocked: {userProfile.allergies.join(', ')}</span>
           </div>
-          <div className="ml-auto flex gap-1.5">
+          <div className="sm:ml-auto flex gap-1.5 flex-wrap">
             {userProfile.goals.map(g => (
               <span key={g} className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">{g}</span>
             ))}
@@ -250,7 +250,7 @@ const RoutineDashboard = () => {
                 </span>
                 <p className="text-xs text-muted-foreground">{activeRoutine.description}</p>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {activeRoutine.steps.map(step => {
                   const product = getProductById(step.productId);
                   if (!product) return null;
@@ -285,7 +285,7 @@ const RoutineDashboard = () => {
               if (!product) return null;
               const daysLeft = Math.round(item.remainingPercent / item.usageRatePerDay);
               return (
-                <div key={item.productId} className="rounded-xl border border-warning/20 bg-warning/5 p-4 flex items-center gap-4">
+                <div key={item.productId} className="rounded-xl border border-warning/20 bg-warning/5 p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
                   <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center text-lg font-bold text-warning shrink-0">
                     {item.remainingPercent}%
                   </div>
@@ -336,7 +336,7 @@ const RoutineDashboard = () => {
         {/* Inventory */}
         <section>
           <h2 className="text-lg font-bold text-foreground mb-4">Your Inventory</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {inventory.filter(i => i.remainingPercent >= 15).map(item => {
               const product = getProductById(item.productId);
               if (!product) return null;

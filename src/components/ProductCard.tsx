@@ -75,7 +75,7 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden hover:shadow-md transition-shadow group animate-fade-in">
       {/* Product image */}
-      <div className="h-44 bg-gradient-to-br from-secondary to-muted flex items-center justify-center relative overflow-hidden">
+      <div className="h-32 sm:h-44 bg-gradient-to-br from-secondary to-muted flex items-center justify-center relative overflow-hidden">
         {product.imageUrl ? (
           <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain p-2" />
         ) : (
@@ -94,24 +94,24 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
         )}
       </div>
 
-      <div className="p-4 space-y-2.5">
+      <div className="p-3 sm:p-4 space-y-2 sm:space-y-2.5">
         <div>
           <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{product.brand}</p>
           <h3 className="text-sm font-semibold text-foreground leading-tight">{product.name}</h3>
         </div>
 
         {/* Star rating */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
           <StarRating rating={product.rating} />
-          <span className="text-xs font-semibold text-foreground">{product.rating}/5</span>
-          <span className="text-[10px] text-muted-foreground">
+          <span className="text-[10px] sm:text-xs font-semibold text-foreground">{product.rating}/5</span>
+          <span className="text-[9px] sm:text-[10px] text-muted-foreground hidden sm:inline">
             {product.ratingCount.toLocaleString()} ratings &amp; {product.reviewCount.toLocaleString()} reviews
           </span>
         </div>
 
-        <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{product.description}</p>
+        <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed line-clamp-2">{product.description}</p>
 
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-wrap gap-1 hidden sm:flex">
           {product.ingredients.slice(0, 3).map(ing => (
             <span key={ing} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{ing}</span>
           ))}
@@ -123,7 +123,7 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
             {discount > 0 && (
               <span className="text-sm text-muted-foreground line-through">₹{mrpInr.toLocaleString()}</span>
             )}
-            <p className="text-lg font-bold text-foreground">₹{priceInr.toLocaleString()}</p>
+            <p className="text-sm sm:text-lg font-bold text-foreground">₹{priceInr.toLocaleString()}</p>
             {discount > 0 && (
               <span className="text-xs font-bold text-success">{discount}% Off</span>
             )}
