@@ -138,25 +138,25 @@ const RoutineDashboard = () => {
       )}
 
       {/* Hero Banner */}
-      <div className="relative h-[260px] overflow-hidden">
+      <div className="relative h-[180px] sm:h-[260px] overflow-hidden">
         <img src={heroImage} alt="Beauty collection" className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-r from-foreground/70 via-foreground/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-r from-foreground/80 via-foreground/50 to-transparent sm:from-foreground/70 sm:via-foreground/40" />
         <div className="absolute inset-0 flex items-center">
-          <div className="container">
-            <p className="text-xs uppercase tracking-[0.2em] text-primary-foreground/70 mb-2 font-medium">AI-Powered Beauty</p>
-            <h2 className="text-3xl md:text-4xl font-serif font-bold text-primary-foreground leading-tight">
+          <div className="container px-4 sm:px-8">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-primary-foreground/70 mb-1 sm:mb-2 font-medium">AI-Powered Beauty</p>
+            <h2 className="text-xl sm:text-3xl md:text-4xl font-serif font-bold text-primary-foreground leading-tight">
               Your Routine,<br />Intelligently Curated
             </h2>
-            <p className="text-sm text-primary-foreground/80 mt-2 max-w-sm">
+            <p className="text-xs sm:text-sm text-primary-foreground/80 mt-1 sm:mt-2 max-w-sm hidden sm:block">
               Smart routines, proactive alerts, and ingredient safety — all personalized for {userProfile.name}.
             </p>
-            <div className="flex items-center gap-3 mt-4">
-              <span className="text-[10px] uppercase tracking-wider bg-primary/90 text-primary-foreground px-3 py-1 rounded-full font-semibold">
+            <div className="flex items-center gap-2 sm:gap-3 mt-2 sm:mt-4">
+              <span className="text-[9px] sm:text-[10px] uppercase tracking-wider bg-primary/90 text-primary-foreground px-2 sm:px-3 py-1 rounded-full font-semibold">
                 Skin: {userProfile.skinType}
               </span>
               <button
                 onClick={() => setShowMirror(true)}
-                className="text-[10px] uppercase tracking-wider bg-card/20 backdrop-blur text-primary-foreground px-3 py-1 rounded-full font-medium hover:bg-card/30 transition-colors cursor-pointer"
+                className="text-[9px] sm:text-[10px] uppercase tracking-wider bg-card/20 backdrop-blur text-primary-foreground px-2 sm:px-3 py-1 rounded-full font-medium hover:bg-card/30 transition-colors cursor-pointer"
               >
                 Shade: {userProfile.shadeMatch} ✨
               </button>
