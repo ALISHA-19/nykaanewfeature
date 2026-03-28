@@ -285,7 +285,7 @@ const RoutineDashboard = () => {
               if (!product) return null;
               const daysLeft = Math.round(item.remainingPercent / item.usageRatePerDay);
               return (
-                <div key={item.productId} className="rounded-xl border border-warning/20 bg-warning/5 p-4 flex items-center gap-4">
+                <div key={item.productId} className="rounded-xl border border-warning/20 bg-warning/5 p-3 sm:p-4 flex items-center gap-3 sm:gap-4">
                   <div className="h-12 w-12 rounded-lg bg-warning/10 flex items-center justify-center text-lg font-bold text-warning shrink-0">
                     {item.remainingPercent}%
                   </div>
@@ -336,7 +336,7 @@ const RoutineDashboard = () => {
         {/* Inventory */}
         <section>
           <h2 className="text-lg font-bold text-foreground mb-4">Your Inventory</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {inventory.filter(i => i.remainingPercent >= 15).map(item => {
               const product = getProductById(item.productId);
               if (!product) return null;
