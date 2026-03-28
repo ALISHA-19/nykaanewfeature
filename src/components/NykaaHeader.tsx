@@ -1,15 +1,19 @@
-import { Search, ShoppingBag, Heart, MapPin, Gift, HelpCircle, Smartphone, ChevronDown, X } from 'lucide-react';
+import { Search, ShoppingBag, Heart, MapPin, Gift, HelpCircle, Smartphone, ChevronDown, X, Menu } from 'lucide-react';
 import nykaaLogo from '@/assets/nykaa-logo.png';
 import { useState, useRef, useEffect } from 'react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 import { nykaaCategories, type NykaaCategory } from '@/data/mockDatabase';
 import { categoryDropdowns } from '@/data/categoryData';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
 const NykaaHeader = () => {
   const [searchValue, setSearchValue] = useState('');
   const [openCat, setOpenCat] = useState<NykaaCategory | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const processIntent = useBeautyStore(s => s.processIntent);
+  const isMobile = useIsMobile();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleSearch = () => {
     if (searchValue.trim()) {
@@ -18,7 +22,6 @@ const NykaaHeader = () => {
     }
   };
 
-  // Close on click outside
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
@@ -31,8 +34,8 @@ const NykaaHeader = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-card shadow-sm">
-      {/* Top utility bar */}
-      <div className="bg-muted border-b border-border">
+      {/* Top utility bar - hidden on mobile */}
+      <div className="bg-muted border-b border-border hidden sm:block">
         <div className="container flex items-center justify-between py-1.5 text-[11px] text-muted-foreground">
           <div className="flex items-center gap-4">
             <span className="flex items-center gap-1"><Smartphone className="h-3 w-3" /> Get App</span>
@@ -44,8 +47,42 @@ const NykaaHeader = () => {
       </div>
 
       {/* Main nav */}
-      <div className="container flex items-center gap-6 py-3">
-        <img src={nykaaLogo} alt="Nykaa" className="h-10 object-contain" />
+      <div className="container flex items-center gap-3 sm:gap-6 py-2 sm:py-3">
+        {/* Mobile hamburger */}
+        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+          <SheetTrigger asChild>
+            <button className="lg:hidden p-1">
+              <Menu className="h-5 w-5 text-foreground" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="left" className="w-[280px] p-0">
+            <SheetHeader className="p-4 border-b border-border">
+              <SheetTitle className="text-left">
+                <img src={nykaaLogo} alt="Nykaa" className="h-8 object-contain" />
+              </SheetTitle>
+            </SheetHeader>
+            <nav className="flex flex-col py-2">
+              {['Categories', 'Brands', 'Luxe', 'Nykaa Fashion', 'Beauty Advice'].map(item => (
+                <button key={item} className="text-sm font-medium text-foreground px-4 py-3 text-left hover:bg-muted transition-colors">
+                  {item}
+                </button>
+              ))}
+              <div className="border-t border-border mt-2 pt-2">
+                {nykaaCategories.map(cat => (
+                  <button
+                    key={cat}
+                    onClick={() => { setOpenCat(cat); setMobileMenuOpen(false); }}
+                    className="text-xs text-muted-foreground px-4 py-2.5 text-left hover:text-primary hover:bg-muted transition-colors w-full"
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
+            </nav>
+          </SheetContent>
+        </Sheet>
+
+        <img src={nykaaLogo} alt="Nykaa" className="h-7 sm:h-10 object-contain" />
 
         <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-foreground">
           <span>Categories</span>
@@ -56,21 +93,21 @@ const NykaaHeader = () => {
         </nav>
 
         <div className="flex-1 max-w-md mx-auto">
-          <div className="flex items-center rounded-md border border-border bg-muted px-3 py-2">
-            <Search className="h-4 w-4 text-muted-foreground mr-2" />
+          <div className="flex items-center rounded-md border border-border bg-muted px-2 sm:px-3 py-1.5 sm:py-2">
+            <Search className="h-4 w-4 text-muted-foreground mr-1.5 sm:mr-2 shrink-0" />
             <input
               type="text"
               value={searchValue}
               onChange={e => setSearchValue(e.target.value)}
               onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              placeholder="Search on Nykaa — or type a beauty goal"
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
+              placeholder={isMobile ? "Search or type a goal" : "Search on Nykaa — or type a beauty goal"}
+              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground min-w-0"
             />
           </div>
         </div>
 
-        <div className="flex items-center gap-4">
-          <button className="nykaa-gradient rounded-md px-5 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity">
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button className="nykaa-gradient rounded-md px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity hidden sm:block">
             Sign in
           </button>
           <Heart className="h-5 w-5 text-foreground cursor-pointer hover:text-primary transition-colors" />
@@ -78,9 +115,9 @@ const NykaaHeader = () => {
         </div>
       </div>
 
-      {/* Category bar */}
-      <div className="border-t border-border bg-card" ref={dropdownRef}>
-        <div className="container flex items-center gap-0 overflow-x-auto">
+      {/* Category bar - scrollable */}
+      <div className="border-t border-border bg-card hidden sm:block" ref={dropdownRef}>
+        <div className="container flex items-center gap-0 overflow-x-auto scrollbar-hide">
           {nykaaCategories.map(cat => (
             <button
               key={cat}
@@ -136,9 +173,9 @@ const NykaaHeader = () => {
 
       {/* Ticker */}
       <div className="nykaa-ticker overflow-hidden">
-        <div className="flex animate-ticker-scroll whitespace-nowrap py-1.5">
+        <div className="flex animate-ticker-scroll whitespace-nowrap py-1 sm:py-1.5">
           {[...Array(4)].map((_, i) => (
-            <span key={i} className="text-[11px] font-semibold text-primary-foreground mx-8">
+            <span key={i} className="text-[10px] sm:text-[11px] font-semibold text-primary-foreground mx-4 sm:mx-8">
               🛒 FREE SHIPPING ON ALL ORDERS ABOVE ₹299 • SALE IS LIVE! • AI BEAUTY INTELLIGENCE ENABLED • SMART ROUTINES ACTIVE •
             </span>
           ))}
