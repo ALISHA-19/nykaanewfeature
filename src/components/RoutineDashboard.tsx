@@ -165,14 +165,14 @@ const RoutineDashboard = () => {
         </div>
       </div>
 
-      <div className="container py-8 space-y-8">
+      <div className="container px-4 sm:px-8 py-5 sm:py-8 space-y-6 sm:space-y-8">
         {/* Weather + Profile Strip */}
-        <div className="flex flex-wrap items-center gap-4 rounded-xl bg-muted p-4">
+        <div className="flex flex-wrap items-center gap-2 sm:gap-4 rounded-xl bg-muted p-3 sm:p-4">
           <div className="flex items-center gap-2">
             <Cloud className="h-4 w-4 text-info" />
             <span className="text-xs font-medium text-foreground">{weather.condition}</span>
           </div>
-          <div className="h-4 w-px bg-border" />
+          <div className="h-4 w-px bg-border hidden sm:block" />
           <div className="flex items-center gap-1.5">
             <Droplets className="h-3.5 w-3.5 text-info" />
             <span className="text-xs text-muted-foreground">Humidity {weather.humidity}%</span>
@@ -181,12 +181,12 @@ const RoutineDashboard = () => {
             <Sun className="h-3.5 w-3.5 text-warning" />
             <span className="text-xs text-muted-foreground">UV {weather.uvIndex}</span>
           </div>
-          <div className="h-4 w-px bg-border" />
+          <div className="h-4 w-px bg-border hidden sm:block" />
           <div className="flex items-center gap-1.5">
             <Shield className="h-3.5 w-3.5 text-destructive" />
             <span className="text-xs text-muted-foreground">Blocked: {userProfile.allergies.join(', ')}</span>
           </div>
-          <div className="ml-auto flex gap-1.5">
+          <div className="sm:ml-auto flex gap-1.5 flex-wrap">
             {userProfile.goals.map(g => (
               <span key={g} className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-medium">{g}</span>
             ))}
