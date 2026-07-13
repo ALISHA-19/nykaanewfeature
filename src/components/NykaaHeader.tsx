@@ -1,188 +1,103 @@
-import { Search, ShoppingBag, Heart, MapPin, Gift, HelpCircle, Smartphone, ChevronDown, X, Menu } from 'lucide-react';
-import nykaaLogo from '@/assets/nykaa-logo.png';
-import { useState, useRef, useEffect } from 'react';
-import { useBeautyStore } from '@/store/useBeautyStore';
-import { nykaaCategories, type NykaaCategory } from '@/data/mockDatabase';
-import { categoryDropdowns } from '@/data/categoryData';
-import { useIsMobile } from '@/hooks/use-mobile';
+import { useState, useEffect } from 'react';
+import { Menu, X, Sparkles, Command } from 'lucide-react';
+import auraLogo from '@/assets/aura-logo.png';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 
-const NykaaHeader = () => {
-  const [searchValue, setSearchValue] = useState('');
-  const [openCat, setOpenCat] = useState<NykaaCategory | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
-  const processIntent = useBeautyStore(s => s.processIntent);
-  const isMobile = useIsMobile();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+const navItems = [
+  { label: 'Dashboard', href: '#dashboard' },
+  { label: 'Consultation', href: '#consultation' },
+  { label: 'Library', href: '#library' },
+  { label: 'Insights', href: '#insights' },
+];
 
-  const handleSearch = () => {
-    if (searchValue.trim()) {
-      processIntent(searchValue);
-      setSearchValue('');
-    }
-  };
+const AuraHeader = () => {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
-        setOpenCat(null);
-      }
-    };
-    if (openCat) document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, [openCat]);
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <header className="sticky top-0 z-50 bg-card shadow-sm">
-      {/* Top utility bar - hidden on mobile */}
-      <div className="bg-muted border-b border-border hidden sm:block">
-        <div className="container flex items-center justify-between py-1.5 text-[11px] text-muted-foreground">
-          <div className="flex items-center gap-4">
-            <span className="flex items-center gap-1"><Smartphone className="h-3 w-3" /> Get App</span>
-            <span className="flex items-center gap-1"><MapPin className="h-3 w-3" /> Store & Events</span>
-            <span className="flex items-center gap-1"><Gift className="h-3 w-3" /> Gift Card</span>
-            <span className="flex items-center gap-1"><HelpCircle className="h-3 w-3" /> Help</span>
-          </div>
-        </div>
-      </div>
-
-      {/* Main nav */}
-      <div className="container flex items-center gap-3 sm:gap-6 py-2 sm:py-3">
-        {/* Mobile hamburger */}
-        <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-          <SheetTrigger asChild>
-            <button className="lg:hidden p-1">
-              <Menu className="h-5 w-5 text-foreground" />
-            </button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[280px] p-0">
-            <SheetHeader className="p-4 border-b border-border">
-              <SheetTitle className="text-left">
-                <img src={nykaaLogo} alt="Nykaa" className="h-8 object-contain" />
-              </SheetTitle>
-            </SheetHeader>
-            <nav className="flex flex-col py-2">
-              {['Categories', 'Brands', 'Luxe', 'Nykaa Fashion', 'Beauty Advice'].map(item => (
-                <button key={item} className="text-sm font-medium text-foreground px-4 py-3 text-left hover:bg-muted transition-colors">
-                  {item}
-                </button>
-              ))}
-              <div className="border-t border-border mt-2 pt-2">
-                {nykaaCategories.map(cat => (
-                  <button
-                    key={cat}
-                    onClick={() => { setOpenCat(cat); setMobileMenuOpen(false); }}
-                    className="text-xs text-muted-foreground px-4 py-2.5 text-left hover:text-primary hover:bg-muted transition-colors w-full"
+    <header
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        scrolled ? 'glass border-b border-border/60' : 'bg-transparent'
+      }`}
+    >
+      <div className="container flex items-center justify-between h-16">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5">
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+            <SheetTrigger asChild>
+              <button className="lg:hidden -ml-1 p-1.5 rounded-lg hover:bg-muted transition-colors" aria-label="Open menu">
+                <Menu className="h-5 w-5 text-foreground" />
+              </button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[280px] p-0">
+              <SheetHeader className="p-5 border-b border-border">
+                <SheetTitle className="text-left flex items-center gap-2">
+                  <img src={auraLogo} alt="Aura AI" className="h-7 w-7 object-contain" />
+                  <span className="font-serif italic text-xl">Aura<span className="text-primary"> AI</span></span>
+                </SheetTitle>
+              </SheetHeader>
+              <nav className="flex flex-col py-3">
+                {navItems.map(item => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="text-sm font-medium text-foreground px-5 py-3 hover:bg-muted transition-colors"
                   >
-                    {cat}
-                  </button>
+                    {item.label}
+                  </a>
                 ))}
-              </div>
-            </nav>
-          </SheetContent>
-        </Sheet>
+              </nav>
+            </SheetContent>
+          </Sheet>
 
-        <img src={nykaaLogo} alt="Nykaa" className="h-7 sm:h-10 object-contain" />
+          <a href="#" className="flex items-center gap-2 group">
+            <div className="relative">
+              <img src={auraLogo} alt="Aura AI" className="h-8 w-8 object-contain transition-transform group-hover:scale-105" />
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-serif italic text-2xl leading-none text-foreground">Aura</span>
+              <span className="text-[10px] font-mono uppercase tracking-widest text-primary font-medium">AI</span>
+            </div>
+          </a>
+        </div>
 
-        <nav className="hidden lg:flex items-center gap-5 text-sm font-medium text-foreground">
-          <span>Categories</span>
-          <span>Brands</span>
-          <span className="text-primary font-semibold">Luxe</span>
-          <span>Nykaa Fashion</span>
-          <span>Beauty Advice</span>
+        {/* Center nav */}
+        <nav className="hidden lg:flex items-center gap-1 absolute left-1/2 -translate-x-1/2">
+          {navItems.map(item => (
+            <a
+              key={item.label}
+              href={item.href}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground px-3 py-1.5 rounded-lg hover:bg-muted transition-colors"
+            >
+              {item.label}
+            </a>
+          ))}
         </nav>
 
-        <div className="flex-1 max-w-md mx-auto">
-          <div className="flex items-center rounded-md border border-border bg-muted px-2 sm:px-3 py-1.5 sm:py-2">
-            <Search className="h-4 w-4 text-muted-foreground mr-1.5 sm:mr-2 shrink-0" />
-            <input
-              type="text"
-              value={searchValue}
-              onChange={e => setSearchValue(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && handleSearch()}
-              placeholder={isMobile ? "Search or type a goal" : "Search on Nykaa — or type a beauty goal"}
-              className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground min-w-0"
-            />
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 sm:gap-4">
-          <button className="nykaa-gradient rounded-md px-3 sm:px-5 py-1.5 sm:py-2 text-xs sm:text-sm font-semibold text-primary-foreground hover:opacity-90 transition-opacity hidden sm:block">
+        {/* Right actions */}
+        <div className="flex items-center gap-2">
+          <button className="hidden md:flex items-center gap-1.5 text-xs text-muted-foreground border border-border rounded-lg px-2.5 py-1.5 hover:bg-muted transition-colors">
+            <Command className="h-3 w-3" />
+            <span className="font-mono">K</span>
+          </button>
+          <button className="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-foreground hover:text-primary transition-colors px-3 py-1.5">
             Sign in
           </button>
-          <Heart className="h-5 w-5 text-foreground cursor-pointer hover:text-primary transition-colors" />
-          <ShoppingBag className="h-5 w-5 text-foreground cursor-pointer hover:text-primary transition-colors" />
-        </div>
-      </div>
-
-      {/* Category bar - scrollable */}
-      <div className="border-t border-border bg-card hidden sm:block" ref={dropdownRef}>
-        <div className="container flex items-center gap-0 overflow-x-auto scrollbar-hide">
-          {nykaaCategories.map(cat => (
-            <button
-              key={cat}
-              onClick={() => setOpenCat(openCat === cat ? null : cat)}
-              className={`text-xs font-medium whitespace-nowrap px-4 py-2.5 transition-colors border-b-2 ${
-                openCat === cat
-                  ? 'text-primary border-primary'
-                  : 'text-foreground border-transparent hover:text-primary'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Full-width mega dropdown */}
-        {openCat && categoryDropdowns[openCat] && (
-          <div className="absolute left-0 right-0 bg-card border-t border-border shadow-xl z-50 animate-fade-in">
-            <div className="container py-6">
-              <div className="flex items-center justify-between mb-5">
-                <h3 className="text-sm font-bold text-foreground">{openCat}</h3>
-                <button onClick={() => setOpenCat(null)} className="text-muted-foreground hover:text-foreground transition-colors">
-                  <X className="h-4 w-4" />
-                </button>
-              </div>
-              <div
-                className="grid gap-8"
-                style={{
-                  gridTemplateColumns: `repeat(${Math.min(categoryDropdowns[openCat].length, 5)}, 1fr)`,
-                }}
-              >
-                {categoryDropdowns[openCat].map(sub => (
-                  <div key={sub.name}>
-                    <h4 className="text-xs font-bold text-primary uppercase tracking-wider mb-3 pb-2 border-b border-border">
-                      {sub.name}
-                    </h4>
-                    <ul className="space-y-2">
-                      {sub.items.map(item => (
-                        <li key={item}>
-                          <button className="text-xs text-muted-foreground hover:text-primary hover:translate-x-0.5 transition-all w-full text-left">
-                            {item}
-                          </button>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* Ticker */}
-      <div className="nykaa-ticker overflow-hidden">
-        <div className="flex animate-ticker-scroll whitespace-nowrap py-1 sm:py-1.5">
-          {[...Array(4)].map((_, i) => (
-            <span key={i} className="text-[10px] sm:text-[11px] font-semibold text-primary-foreground mx-4 sm:mx-8">
-              🛒 FREE SHIPPING ON ALL ORDERS ABOVE ₹299 • SALE IS LIVE! • AI BEAUTY INTELLIGENCE ENABLED • SMART ROUTINES ACTIVE •
-            </span>
-          ))}
+          <button className="inline-flex items-center gap-1.5 aura-gradient text-primary-foreground rounded-lg px-4 py-2 text-sm font-semibold shadow-md hover:shadow-glow transition-all">
+            <Sparkles className="h-3.5 w-3.5" />
+            Try Aura
+          </button>
         </div>
       </div>
     </header>
   );
 };
 
-export default NykaaHeader;
+export default AuraHeader;

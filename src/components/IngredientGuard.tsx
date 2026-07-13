@@ -22,10 +22,10 @@ const IngredientGuard = ({ productId, children }: IngredientGuardProps) => {
     return (
       <button
         onClick={handleCheck}
-        className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-sans text-primary-foreground hover:opacity-90 transition-opacity"
+        className="flex items-center gap-2 rounded-xl aura-gradient px-4 py-2 text-sm font-semibold text-primary-foreground hover:shadow-glow transition-all"
       >
         <ShieldCheck className="h-4 w-4" />
-        Add to Routine
+        Add to routine
       </button>
     );
   }
@@ -33,9 +33,9 @@ const IngredientGuard = ({ productId, children }: IngredientGuardProps) => {
   if (result && !result.safe) {
     return (
       <div className="space-y-2">
-        <div className="flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-2.5">
-          <ShieldAlert className="h-4 w-4 text-destructive shrink-0" />
-          <p className="text-xs text-destructive font-sans">{result.reason}</p>
+        <div className="flex items-start gap-2 rounded-xl bg-destructive/10 border border-destructive/20 px-4 py-2.5">
+          <ShieldAlert className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+          <p className="text-xs text-destructive">I blocked this — {result.reason}</p>
         </div>
         {children}
       </div>
@@ -43,9 +43,9 @@ const IngredientGuard = ({ productId, children }: IngredientGuardProps) => {
   }
 
   return (
-    <div className="flex items-center gap-2 rounded-lg bg-success/10 border border-success/20 px-4 py-2.5">
+    <div className="flex items-center gap-2 rounded-xl bg-success-soft border border-success/20 px-4 py-2.5">
       <ShieldCheck className="h-4 w-4 text-success" />
-      <p className="text-xs text-success font-sans">Safe to add — no conflicts detected</p>
+      <p className="text-xs text-success">Safe — I verified it.</p>
     </div>
   );
 };
