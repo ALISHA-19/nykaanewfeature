@@ -1,4 +1,4 @@
-import { ArrowRightLeft, ShieldCheck, ShieldAlert, Star } from 'lucide-react';
+import { ArrowRightLeft, ShieldCheck, ShieldAlert, Star, Sparkles } from 'lucide-react';
 import { useBeautyStore } from '@/store/useBeautyStore';
 import WhyTooltip from './WhyTooltip';
 import type { Product } from '@/data/mockDatabase';
@@ -13,9 +13,9 @@ interface ProductCardProps {
 }
 
 const tierBadge: Record<string, string> = {
-  budget: 'bg-success/10 text-success',
-  mid: 'bg-info/10 text-info',
-  luxury: 'bg-primary/10 text-primary',
+  budget: 'bg-success-soft text-success border-success/20',
+  mid: 'bg-info-soft text-info border-info/20',
+  luxury: 'bg-primary-soft text-primary border-primary/20',
 };
 
 const StarRating = ({ rating }: { rating: number }) => {
@@ -28,9 +28,9 @@ const StarRating = ({ rating }: { rating: number }) => {
           key={i}
           className={`h-3 w-3 ${
             i < full
-              ? 'fill-amber-400 text-amber-400'
+              ? 'fill-accent text-accent'
               : i === full && half
-              ? 'fill-amber-400/50 text-amber-400'
+              ? 'fill-accent/50 text-accent'
               : 'fill-muted text-muted-foreground/30'
           }`}
         />
@@ -51,18 +51,19 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
 
   if (compact) {
     return (
-      <div className="flex items-center gap-3 rounded-lg border border-border bg-card p-3 hover:shadow-sm transition-shadow">
+      <div className="flex items-center gap-3 rounded-xl border border-border bg-background p-3 hover:border-primary/20 transition-all">
         {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.name} className="h-12 w-12 rounded-lg object-contain shrink-0" />
+          <img src={product.imageUrl} alt={product.name} className="h-11 w-11 rounded-lg object-contain shrink-0" />
         ) : (
-          <div className="h-12 w-12 rounded-lg bg-secondary flex items-center justify-center text-base font-bold text-secondary-foreground shrink-0">
+          <div className="h-11 w-11 rounded-lg bg-secondary flex items-center justify-center text-sm font-semibold text-secondary-foreground shrink-0">
             {product.brand.charAt(0)}
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">{product.name}</p>
-          <p className="text-xs text-muted-foreground">{product.brand} · <span className="font-semibold text-primary">₹{priceInr.toLocaleString()}</span>
-            {discount > 0 && <span className="text-success ml-1 text-[10px] font-bold">{discount}% Off</span>}
+          <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
+          <p className="text-xs text-muted-foreground">
+            {product.brand} · <span className="font-semibold text-foreground">₹{priceInr.toLocaleString()}</span>
+            {discount > 0 && <span className="text-success ml-1 text-[10px] font-bold">-{discount}%</span>}
           </p>
         </div>
         {showSwap && alts.length > 0 && (
@@ -73,92 +74,85 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card overflow-hidden hover:shadow-md transition-shadow group animate-fade-in">
+    <div className="rounded-2xl border border-border bg-card overflow-hidden hover:shadow-md hover:border-primary/15 transition-all group animate-fade-in">
       {/* Product image */}
-      <div className="h-32 sm:h-44 bg-gradient-to-br from-secondary to-muted flex items-center justify-center relative overflow-hidden">
+      <div className="h-32 sm:h-40 bg-gradient-to-br from-muted/40 to-primary-soft/40 flex items-center justify-center relative overflow-hidden">
         {product.imageUrl ? (
-          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain p-2" />
+          <img src={product.imageUrl} alt={product.name} className="h-full w-full object-contain p-3 transition-transform group-hover:scale-105" />
         ) : (
-          <span className="text-4xl font-serif font-bold text-primary/20">{product.brand.charAt(0)}{product.brand.charAt(1)}</span>
+          <span className="text-4xl font-serif italic text-primary/30">{product.brand.charAt(0)}</span>
         )}
-        <span className={`absolute top-3 left-3 text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded ${tierBadge[product.tier]}`}>
+        <span className={`absolute top-2.5 left-2.5 aura-badge ${tierBadge[product.tier]}`}>
           {product.tier}
         </span>
         {showSwap && alts.length > 0 && (
           <button
             onClick={() => setShowAlts(!showAlts)}
-            className="absolute top-3 right-3 bg-card/90 backdrop-blur rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity border border-border hover:border-primary"
+            className="absolute top-2.5 right-2.5 bg-card/95 backdrop-blur rounded-lg p-1.5 opacity-0 group-hover:opacity-100 transition-opacity border border-border shadow-sm hover:border-primary"
+            aria-label="Show alternatives"
           >
             <ArrowRightLeft className="h-3.5 w-3.5 text-foreground" />
           </button>
         )}
       </div>
 
-      <div className="p-3 sm:p-4 space-y-2 sm:space-y-2.5">
+      <div className="p-3 sm:p-4 space-y-2.5">
         <div>
-          <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">{product.brand}</p>
-          <h3 className="text-sm font-semibold text-foreground leading-tight">{product.name}</h3>
+          <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground/70">{product.brand}</p>
+          <h3 className="text-sm font-semibold text-foreground leading-snug mt-0.5 line-clamp-2">{product.name}</h3>
         </div>
 
-        {/* Star rating */}
-        <div className="flex items-center gap-1 sm:gap-2 flex-wrap">
+        <div className="flex items-center gap-1.5 flex-wrap">
           <StarRating rating={product.rating} />
-          <span className="text-[10px] sm:text-xs font-semibold text-foreground">{product.rating}/5</span>
-          <span className="text-[9px] sm:text-[10px] text-muted-foreground hidden sm:inline">
-            {product.ratingCount.toLocaleString()} ratings &amp; {product.reviewCount.toLocaleString()} reviews
+          <span className="text-[11px] font-semibold text-foreground">{product.rating}</span>
+          <span className="text-[10px] text-muted-foreground hidden sm:inline">
+            · {(product.ratingCount / 1000).toFixed(1)}k
           </span>
         </div>
 
-        <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed line-clamp-2">{product.description}</p>
+        <p className="text-[11px] sm:text-xs text-muted-foreground leading-relaxed line-clamp-2 hidden sm:block">{product.description}</p>
 
-        <div className="flex flex-wrap gap-1 hidden sm:flex">
-          {product.ingredients.slice(0, 3).map(ing => (
-            <span key={ing} className="text-[10px] px-1.5 py-0.5 rounded bg-muted text-muted-foreground">{ing}</span>
-          ))}
+        {/* Price */}
+        <div className="flex items-baseline gap-2 pt-1">
+          <p className="text-base sm:text-lg font-semibold text-foreground">₹{priceInr.toLocaleString()}</p>
+          {discount > 0 && (
+            <>
+              <span className="text-xs text-muted-foreground line-through">₹{mrpInr.toLocaleString()}</span>
+              <span className="text-[11px] font-semibold text-success">-{discount}%</span>
+            </>
+          )}
         </div>
 
-        {/* Price with MRP & discount */}
-        <div className="flex items-center justify-between pt-1">
-          <div className="flex items-baseline gap-2">
-            {discount > 0 && (
-              <span className="text-sm text-muted-foreground line-through">₹{mrpInr.toLocaleString()}</span>
-            )}
-            <p className="text-sm sm:text-lg font-bold text-foreground">₹{priceInr.toLocaleString()}</p>
-            {discount > 0 && (
-              <span className="text-xs font-bold text-success">{discount}% Off</span>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            {reason && (
-              <WhyTooltip reason={reason}>
-                <button className="text-[10px] text-primary underline underline-offset-2">Why this?</button>
-              </WhyTooltip>
-            )}
-          </div>
-        </div>
-        {discount > 0 && (
-          <p className="text-[10px] text-muted-foreground -mt-1">inclusive of all taxes</p>
+        {/* AI reasoning */}
+        {reason && (
+          <WhyTooltip reason={reason}>
+            <button className="w-full flex items-center gap-1.5 text-[11px] text-primary bg-primary-soft/50 hover:bg-primary-soft rounded-lg px-2.5 py-1.5 transition-colors">
+              <Sparkles className="h-3 w-3" />
+              <span className="font-medium">Why Aura recommends this</span>
+            </button>
+          </WhyTooltip>
         )}
 
-        {/* Ingredient Guard */}
+        {/* AI Safety Intelligence */}
         {showGuard && (
           <div>
             {!guardResult ? (
               <button
                 onClick={() => setGuardResult(validateIngredients(product.id))}
-                className="w-full nykaa-gradient rounded-lg py-2.5 text-xs font-semibold text-primary-foreground hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5"
+                className="w-full aura-gradient rounded-xl py-2.5 text-xs font-semibold text-primary-foreground hover:shadow-glow transition-all flex items-center justify-center gap-1.5"
               >
-                <ShieldCheck className="h-3.5 w-3.5" /> Add to Routine
+                <ShieldCheck className="h-3.5 w-3.5" />
+                Add to my routine
               </button>
             ) : guardResult.safe ? (
-              <div className="flex items-center gap-2 rounded-lg bg-success/10 border border-success/20 px-3 py-2">
-                <ShieldCheck className="h-4 w-4 text-success" />
-                <p className="text-xs text-success font-medium">Safe — no conflicts</p>
+              <div className="flex items-center gap-2 rounded-xl bg-success-soft border border-success/20 px-3 py-2">
+                <ShieldCheck className="h-4 w-4 text-success shrink-0" />
+                <p className="text-xs text-success font-medium">Safe — I verified it.</p>
               </div>
             ) : (
-              <div className="flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/20 px-3 py-2">
-                <ShieldAlert className="h-4 w-4 text-destructive" />
-                <p className="text-xs text-destructive">{guardResult.reason}</p>
+              <div className="flex items-start gap-2 rounded-xl bg-destructive/10 border border-destructive/20 px-3 py-2">
+                <ShieldAlert className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
+                <p className="text-xs text-destructive leading-snug">I blocked this — {guardResult.reason}</p>
               </div>
             )}
           </div>
@@ -167,7 +161,7 @@ const ProductCard = ({ product, reason, showSwap = true, showGuard = false, comp
         {/* Alternatives */}
         {showAlts && alts.length > 0 && (
           <div className="space-y-2 pt-2 border-t border-border animate-fade-in">
-            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Smart Swaps</p>
+            <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Aura suggests</p>
             {alts.map(alt => (
               <ProductCard key={alt.id} product={alt} compact showSwap={false} />
             ))}
