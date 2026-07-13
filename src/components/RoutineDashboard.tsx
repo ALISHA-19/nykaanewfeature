@@ -170,7 +170,7 @@ const AuraDashboard = () => {
               icon={Activity}
               label="Skin type"
               value={userProfile.skinType}
-              hint={`${userProfile.undertone || 'warm'} undertone`}
+              hint="warm undertone"
               tone="primary"
             />
             <StatCard
