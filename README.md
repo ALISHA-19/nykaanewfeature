@@ -1,73 +1,20 @@
-# Welcome to your Lovable project
+# Aura AI: a beauty-advisor concept for Nykaa
 
-## Project info
+A working prototype by Alisha Chaudhari of a new Nykaa feature: **Aura**, a personal AI beauty advisor that builds a routine, checks it for safety and keeps it stocked.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## What's inside
+- **AI skin consultation:** upload a selfie, and Aura reads skin type, undertone and shade, then suggests matching products. It uses Gemini 2.5 Flash through a Supabase edge function.
+- **Smart intent bar:** tell Aura your goal and get a routine built for it.
+- **Ingredient safety layer:** flags clashes between products in a routine (for example, when to use Vitamin C) and explains *why* each product is recommended.
+- **Virtual mirror** for trying shades.
+- **Autonomous replenishment:** a routine dashboard that tracks how much product is left and offers a one-tap reorder with auto-refill.
+- **Category browser** with Nykaa-style product cards.
 
-## How can I edit this code?
+A concept prototype on mock product data. It is not affiliated with or endorsed by Nykaa.
 
-There are several ways of editing your application.
+**Stack:** React + Vite + TypeScript, Tailwind + shadcn/ui, Zustand, Supabase edge functions. Built with Lovable.
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+npm install
 npm run dev
 ```
-
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
